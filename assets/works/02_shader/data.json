@@ -1,0 +1,11 @@
+{
+  "id": "work2",
+  "title": "Holographic Wireframe Shader",
+  "tags": ["Unity", "Shader", "VFX"],
+  "summary": "Unity HLSLで記述したインタラクティブなワイヤーフレームシェーダー。",
+  "description": "オブジェクトの輪郭からワイヤーフレームが発光しながら展開するカスタムシェーダーです。\n音楽のBPMに合わせて発光強度が変化する仕組みも組み込んでおり、ライブ演出などで活用できます。\nノイズ関数を用いたパーティクル表現と組み合わせています。",
+  "images": [
+    "1.png",
+    "2.png"
+  ]
+}
