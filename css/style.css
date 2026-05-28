@@ -430,13 +430,44 @@ img {
 
 .modal-body .modal-images {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    padding-bottom: 0.5rem;
+}
+
+.modal-body .modal-images::-webkit-scrollbar {
+    height: 8px;
+}
+
+.modal-body .modal-images::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
 }
 
 .modal-body .modal-images img {
     border-radius: 4px;
     width: 100%;
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    object-fit: contain;
+}
+
+.modal-body .modal-images .video-container {
+    width: 100%;
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    aspect-ratio: 16 / 9;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.modal-body .modal-images .video-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 
 /* Works Filters & Tags */

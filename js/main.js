@@ -40,7 +40,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const work = await response.json();
                 
-                work.images = work.images.map(img => `${folderPath}/${img}`);
+                if (work.media) {
+                    work.images = work.media
+                        .filter(m => m.type === 'image')
+                        .map(m => `${folderPath}/${m.src}`);
+                    // プレビュー用にフルパスを設定
+                    work.media.forEach(m => {
+                        if (m.type === 'image') m.fullSrc = `${folderPath}/${m.src}`;
+                    });
+                } else if (work.images) {
+                    work.images = work.images.map(img => `${folderPath}/${img}`);
+                } else {
+                    work.images = [];
+                }
                 work.tags = work.tags || [];
                 work.tags.forEach(tag => allTags.add(tag));
                 
@@ -157,7 +169,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Modal Logic
     function openModal(work) {
-        let imagesHtml = work.images.map(src => `<img src="${src}" alt="${work.title}">`).join('');
+        let mediaHtml = '';
+        if (work.media && work.media.length > 0) {
+            mediaHtml = work.media.map(m => {
+                if (m.type === 'youtube') {
+                    return `
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/${m.id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    `;
+                } else if (m.type === 'image') {
+                    return `<img src="${m.fullSrc}" alt="${work.title}">`;
+                }
+                return '';
+            }).join('');
+        } else {
+            if (work.youtubeIds && work.youtubeIds.length > 0) {
+                mediaHtml += work.youtubeIds.map(id => `
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                `).join('');
+            }
+            if (work.images && work.images.length > 0) {
+                mediaHtml += work.images.map(src => `<img src="${src}" alt="${work.title}">`).join('');
+            }
+        }
+
         let tagsHtml = '';
         if (work.tags && work.tags.length > 0) {
             tagsHtml = `<div class="work-tags" style="margin-bottom: 1rem;">${work.tags.map(tag => `<span class="work-tag">${tag}</span>`).join('')}</div>`;
@@ -168,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <h2 class="modal-title">${work.title}</h2>
             <div class="modal-desc">${work.description}</div>
             <div class="modal-images">
-                ${imagesHtml}
+                ${mediaHtml}
             </div>
         `;
         
