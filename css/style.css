@@ -434,17 +434,34 @@ img {
     gap: 1rem;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
+    scrollbar-width: none;
     padding-bottom: 0.5rem;
 }
 
 .modal-body .modal-images::-webkit-scrollbar {
-    height: 8px;
+    display: none;
 }
 
-.modal-body .modal-images::-webkit-scrollbar-thumb {
+.modal-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.modal-pagination-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
     background: rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border: none;
+    padding: 0;
+}
+
+.modal-pagination-dot.active {
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .modal-body .modal-images img {

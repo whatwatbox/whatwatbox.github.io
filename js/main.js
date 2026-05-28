@@ -170,7 +170,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Modal Logic
     function openModal(work) {
         let mediaHtml = '';
+        let mediaCount = 0;
         if (work.media && work.media.length > 0) {
+            mediaCount = work.media.length;
             mediaHtml = work.media.map(m => {
                 if (m.type === 'youtube') {
                     return `
@@ -185,6 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }).join('');
         } else {
             if (work.youtubeIds && work.youtubeIds.length > 0) {
+                mediaCount += work.youtubeIds.length;
                 mediaHtml += work.youtubeIds.map(id => `
                     <div class="video-container">
                         <iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -192,8 +195,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `).join('');
             }
             if (work.images && work.images.length > 0) {
+                mediaCount += work.images.length;
                 mediaHtml += work.images.map(src => `<img src="${src}" alt="${work.title}">`).join('');
             }
+        }
+
+        let paginationHtml = '';
+        if (mediaCount > 1) {
+            paginationHtml = '<div class="modal-pagination">';
+            for (let i = 0; i < mediaCount; i++) {
+                paginationHtml += `<button class="modal-pagination-dot ${i === 0 ? 'active' : ''}" aria-label="Slide ${i + 1}"></button>`;
+            }
+            paginationHtml += '</div>';
         }
 
         let tagsHtml = '';
@@ -205,13 +218,37 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${tagsHtml}
             <h2 class="modal-title">${work.title}</h2>
             <div class="modal-desc">${work.description}</div>
-            <div class="modal-images">
+            ${paginationHtml}
+            <div class="modal-images" id="modal-images-container">
                 ${mediaHtml}
             </div>
         `;
         
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
+
+        if (mediaCount > 1) {
+            const modalImagesContainer = document.getElementById('modal-images-container');
+            const dots = document.querySelectorAll('.modal-pagination-dot');
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    const scrollAmount = modalImagesContainer.clientWidth * index;
+                    modalImagesContainer.scrollTo({
+                        left: scrollAmount,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            modalImagesContainer.addEventListener('scroll', () => {
+                const scrollLeft = modalImagesContainer.scrollLeft;
+                const index = Math.round(scrollLeft / modalImagesContainer.clientWidth);
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+            });
+        }
     }
 
     function closeModal() {
