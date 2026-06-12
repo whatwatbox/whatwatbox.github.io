@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let slideshowIntervals = {};
     let loadedWorks = [];
     let allTags = new Set();
+    let currentResizeHandler = null;
 
     if (typeof worksFolders !== 'undefined' && worksContainer) {
         for (let i = 0; i < worksFolders.length; i++) {
@@ -227,8 +228,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
 
+        const modalImagesContainer = document.getElementById('modal-images-container');
+
+        const updateHeight = () => {
+            if (!modalImagesContainer) return;
+            const scrollLeft = modalImagesContainer.scrollLeft;
+            if (modalImagesContainer.clientWidth === 0) return;
+            const index = Math.round(scrollLeft / modalImagesContainer.clientWidth) || 0;
+            const currentChild = modalImagesContainer.children[index];
+            if (currentChild) {
+                modalImagesContainer.style.height = currentChild.offsetHeight + 'px';
+            }
+        };
+
         if (mediaCount > 1) {
-            const modalImagesContainer = document.getElementById('modal-images-container');
             const dots = document.querySelectorAll('.modal-pagination-dot');
 
             dots.forEach((dot, index) => {
@@ -243,17 +256,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             modalImagesContainer.addEventListener('scroll', () => {
                 const scrollLeft = modalImagesContainer.scrollLeft;
-                const index = Math.round(scrollLeft / modalImagesContainer.clientWidth);
-                dots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === index);
-                });
+                if (modalImagesContainer.clientWidth > 0) {
+                    const index = Math.round(scrollLeft / modalImagesContainer.clientWidth);
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === index);
+                    });
+                }
+                updateHeight();
             });
+        }
+
+        if (mediaCount > 0) {
+            currentResizeHandler = updateHeight;
+            window.addEventListener('resize', currentResizeHandler);
+
+            const imgs = modalImagesContainer.querySelectorAll('img');
+            imgs.forEach(img => {
+                if (img.complete) {
+                    updateHeight();
+                } else {
+                    img.addEventListener('load', updateHeight);
+                }
+            });
+
+            // モーダル表示アニメーション後に高さを再計算
+            setTimeout(updateHeight, 100);
+            setTimeout(updateHeight, 400); // アニメーション完了後
         }
     }
 
     function closeModal() {
         modal.classList.remove('active');
         document.body.style.overflow = '';
+        if (currentResizeHandler) {
+            window.removeEventListener('resize', currentResizeHandler);
+            currentResizeHandler = null;
+        }
         setTimeout(() => {
             modalBody.innerHTML = '';
         }, 400);

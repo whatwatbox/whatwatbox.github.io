@@ -436,6 +436,8 @@ img {
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     padding-bottom: 0.5rem;
+    align-items: start;
+    transition: height 0.3s ease;
 }
 
 .modal-body .modal-images::-webkit-scrollbar {
