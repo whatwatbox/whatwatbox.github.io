@@ -1,0 +1,29 @@
+{
+  "id": "clusterBINGO大会",
+  "isPublic": true,
+  "title": "clusterBINGO大会",
+  "tags": [
+    "Metaverse",
+    "cluster",
+    "Event",
+    "Game"
+  ],
+  "summary": "clusterで開催したBINGO大会",
+  "description": "■ 作品概要\n2024年の年末にclusterで開催したBINGO大会です。\n\n■ コンセプト：巨大なBINGO抽選機の中でBINGOする\n抽選機の中でBINGO大会をしてみれば楽しいのではと思い制作しました。\n会場はそれ自体がBINGO抽選機となっており、プレイヤーのサイズよりも大きなボールで抽選が行われます。\n見た目は金色を基調としており、年末のスペシャル感を演出できたと思います。\n\n■ 技術的な挑戦\nこの頃はclusterScriptがある程度充実しており、BINGOの抽選ギミック以外にも、事前募集したBoothのギフトコードQRを、BINGO達成者が選択して入手できるようなギミックも作成しました。\n結果的に、一部不具合はあったものの大きな問題はなく、最後までイベントを遂行することができました。\n\n■ こだわり\nBINGO抽選を物理抽選にすることで、バーチャルならではのワクワクするような体験が実現できたと感じています。\n\n■ 実績\n開催日：2024/12/30\n延べ来場者数：993\nいいね数：216\n",
+  "links": [
+    {
+      "text": "#clusterBINGO大会",
+      "url": "https://x.com/search?q=%23clusterBINGO%E5%A4%A7%E4%BC%9A&src=typed_query&f=live"
+    }
+  ],
+  "media": [
+    {
+      "type": "image",
+      "src": "アートボード3.png"
+    },
+    {
+      "type": "image",
+      "src": "アートボード4.jpg"
+    }
+  ]
+}

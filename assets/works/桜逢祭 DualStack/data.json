@@ -1,0 +1,41 @@
+{
+  "id": "桜逢祭 DualStack",
+  "isPublic": true,
+  "title": "桜逢祭 DualStack",
+  "tags": [
+    "Metaverse",
+    "cluster",
+    "Event",
+    "DJ"
+  ],
+  "summary": "リアル会場とメタバースを繋いだDJイベント、cluster会場制作担当",
+  "description": "■ 作品概要\n奥多摩の廃校とcluster、VRChat、Resoniteを繋いだDJイベントのcluster会場の制作/演出を担当しました。\nまた、当日のcluster会場DJとしても出演しました。\n\n■ コンセプト：教室を改造したDJ会場\nメイン会場が学校ということで、メタバース会場は教室を再現したモデルをもとにそれぞれの会場を制作することになりました。\n私が担当したcluster会場では、ライトやライティングのギミックを実装し、\nより没入感のある空間になるようにしました。\n\n■ こだわり\n様々な曲がかかることが想定されていたため、\n穏やかな演出や激しい演出などを事前にプリセットとして用意をし、\nリアルタイムながらも曲にあった賑やかさを演出できたと思います。\n\n■ 実績\n開催日：2025/04/05\n延べ来場者数：約130(cluster会場/3部平均)\n",
+  "links": [
+    {
+      "text": "イベントページ(第1部)",
+      "url": "https://cluster.mu/e/7db9c6ef-670d-4240-9a3a-328dc11d1f99"
+    },
+    {
+      "text": "イベントページ(第2部)",
+      "url": "https://cluster.mu/e/b81b65cd-c74d-4715-8af6-49a8d27eaf19"
+    },
+    {
+      "text": "イベントページ(第3部)",
+      "url": "https://cluster.mu/e/7a2b7e0d-3290-446a-83ad-b52cab3d92d9"
+    }
+  ],
+  "media": [
+    {
+      "type": "image",
+      "src": "アートボード2.jpg"
+    },
+    {
+      "type": "image",
+      "src": "アートボード1.jpg"
+    },
+    {
+      "type": "image",
+      "src": "アートボード3.jpg"
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Works Editor - whatwatbox</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=M+PLUS+2:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Works Editor</h2>
+                <button id="btn-open-dir" class="btn primary">Open Root Folder</button>
+                <p class="help-text" style="margin-top:0.5rem; font-size:0.75rem;">(whatwatbox.github.ioを選択)</p>
+            </div>
+            <div class="sidebar-list sortable-list" id="works-list">
+                <!-- Works folders will be listed here -->
+            </div>
+            <div class="sidebar-footer">
+                <button id="btn-save-order" class="btn outline" style="margin-bottom: 0.5rem;" disabled>Save Display Order</button>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="btn-new-work" class="btn outline" disabled>+ New</button>
+                    <button id="btn-copy-work" class="btn outline" disabled>+ Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content (Editor Form) -->
+        <div class="main-content">
+            <div id="editor-empty" class="editor-empty">
+                <p>左側のメニューから「works」フォルダを開いてください。</p>
+            </div>
+
+            <div id="editor-form" class="editor-form hidden">
+                <div class="form-header">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <h3 style="margin: 0;">Editing: <span id="current-folder-name"></span></h3>
+                        <button id="btn-rename-folder" class="btn small outline" style="margin-left: 0.5rem;">Rename</button>
+                        <button id="btn-delete-folder" class="btn small danger">Delete</button>
+                    </div>
+                    <button id="btn-save" class="btn primary">Save Changes</button>
+                </div>
+                
+                <div class="form-body">
+                    <div class="section-box" style="margin-bottom: 2rem;">
+                        <div class="form-group" style="display: flex; align-items: center; gap: 1rem;">
+                            <label for="work-public" style="margin: 0;">公開設定 (Public):</label>
+                            <input type="checkbox" id="work-public" checked style="width: 1.2rem; height: 1.2rem; accent-color: var(--accent); cursor: pointer;">
+                            <span class="help-text" style="margin: 0;">チェックを外すとトップページに表示されません</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="work-id">Work ID (URLなどで使用される一意のID)</label>
+                            <input type="text" id="work-id" class="form-control" readonly style="opacity: 0.7;">
+                        </div>
+                        <div class="form-group">
+                            <label for="work-title">Title</label>
+                            <input type="text" id="work-title" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tags</label>
+                        <div id="tags-input-container" class="tags-input-container form-control">
+                            <div id="tags-list" class="tags-list"></div>
+                            <input type="text" id="tag-input" placeholder="Type a tag and press Enter" list="tag-suggestions" autocomplete="off">
+                            <datalist id="tag-suggestions"></datalist>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="work-summary">Summary (一覧用短い説明)</label>
+                        <input type="text" id="work-summary" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="work-description">Description (詳細説明)</label>
+                        <textarea id="work-description" class="form-control" rows="8"></textarea>
+                    </div>
+
+                    <!-- Links -->
+                    <div class="form-group section-box">
+                        <div class="section-header">
+                            <label>Links</label>
+                            <button id="btn-add-link" class="btn small">+ Add Link</button>
+                        </div>
+                        <div id="links-container" class="sortable-list"></div>
+                    </div>
+
+                    <!-- Media -->
+                    <div class="form-group section-box">
+                        <div class="section-header">
+                            <label>Media</label>
+                        </div>
+                        <p class="help-text">※画像の項目に画像ファイルをドラッグ＆ドロップすると、フォルダに画像がコピーされ自動でファイル名が設定されます。</p>
+                        <div id="media-container" class="sortable-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Template for Link Item -->
+    <template id="tpl-link-item">
+        <div class="list-item link-item">
+            <div class="drag-handle">☰</div>
+            <input type="text" class="link-text form-control" placeholder="Link Text (e.g., VRChatでワールドへ行く)">
+            <input type="text" class="link-url form-control" placeholder="URL (e.g., https://...)">
+            <button class="btn danger small btn-remove-link">×</button>
+        </div>
+    </template>
+
+    <!-- Template for Media Item -->
+    <template id="tpl-media-item">
+        <div class="list-item media-item dropzone" style="flex-direction: column;">
+            <div style="display: flex; width: 100%; gap: 0.5rem; align-items: flex-start;">
+                <div class="drag-handle">☰</div>
+                <select class="media-type form-control">
+                    <option value="image">Image</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="embed">Embed</option>
+                </select>
+                
+                <div class="media-input-wrapper">
+                    <input type="text" class="media-val-image form-control" placeholder="Image Filename (e.g., 1.png)">
+                    <input type="text" class="media-val-youtube form-control hidden" placeholder="YouTube Video ID (e.g., dQw4w9WgXcQ)">
+                    <textarea class="media-val-embed form-control hidden" rows="2" placeholder="<iframe ...></iframe>"></textarea>
+                </div>
+                
+                <button class="btn danger small btn-remove-media">×</button>
+            </div>
+            <div class="media-preview" style="width: 100%; margin-top: 0.5rem; text-align: center; background: rgba(0,0,0,0.2); border-radius: 4px; min-height: 50px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #888; font-size: 0.85rem;"></div>
+        </div>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/umd.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "id": "OPENTHEWATBOX",
+  "isPublic": false,
+  "title": "OPENTHEWATBOX",
+  "tags": [
+    "Metaverse",
+    "cluster",
+    "Event"
+  ],
+  "summary": "clusterの音楽イベント",
+  "description": "■ 作品概要\nclusterで開催していた音楽イベントです。\n最近では過去作を不定期で再演しています。\n\n■ コンセプト：完全同期した演出+会場変形\nこのイベントでは約50分間、音楽に完全同期した演出を楽しむことを目指しました。\n作業量こそは膨大ですが、いい作品ができたと感じています。\nまた、ただの音楽イベントにならないよう、イベントが進むにつれ数段階の会場変形を用意することで、よりよい体験になったと考えています。\n\n■ 技術的な挑戦\nTimelineに対してアニメーションクリップを挿入するなどの頻繁に使う動作を、\n自作のエディタ拡張を使用する事により作業の効率化を行っています。\n\n■ こだわり\nすべてをTimelineで制御することにより、完全に曲に合わせた演出を組メル用にしました。\nまた、視界ジャックで画面を振動させる事により、より没入感のある体験になったと思います。\n\n■ 実績\n【OPENTHEWATBOXv4.3】\n開催日：2024/06/04\n延べ来場者数：264\nいいね数：107\n",
+  "links": [
+    {
+      "text": "#OPENTHEWATBOX",
+      "url": "https://x.com/hashtag/OPENTHEWATBOX"
+    }
+  ],
+  "media": [
+    {
+      "type": "image",
+      "src": "pasted_1781700625322.png"
+    },
+    {
+      "type": "image",
+      "src": "pasted_1781701122760.png"
+    },
+    {
+      "type": "image",
+      "src": "pasted_1781701132291.png"
+    },
+    {
+      "type": "image",
+      "src": "pasted_1781701301444.png"
+    },
+    {
+      "type": "youtube",
+      "id": "qBd-lFGA4os"
+    }
+  ]
+}

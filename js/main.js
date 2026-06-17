@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const work = await response.json();
                 
+                if (work.isPublic === false) continue;
+                
                 if (work.media) {
                     work.images = work.media
                         .filter(m => m.type === 'image')
@@ -183,6 +185,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     `;
                 } else if (m.type === 'image') {
                     return `<img src="${m.fullSrc}" alt="${work.title}">`;
+                } else if (m.type === 'embed') {
+                    return `
+                        <div class="video-container">
+                            ${m.html}
+                        </div>
+                    `;
                 }
                 return '';
             }).join('');
@@ -214,15 +222,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (work.tags && work.tags.length > 0) {
             tagsHtml = `<div class="work-tags" style="margin-bottom: 1rem;">${work.tags.map(tag => `<span class="work-tag">${tag}</span>`).join('')}</div>`;
         }
+
+        let linksHtml = '';
+        if (work.links && work.links.length > 0) {
+            linksHtml = `<div class="modal-links">${work.links.map(link => `<a href="${link.url}" target="_blank" rel="noopener noreferrer" class="modal-link-btn">${link.text}</a>`).join('')}</div>`;
+        }
         
+        let galleryHtml = '';
+        if (mediaCount > 1) {
+            galleryHtml = `
+            <div class="modal-gallery-wrapper">
+                <button class="modal-nav-btn prev" aria-label="Previous">
+                    <svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                </button>
+                <div class="modal-images" id="modal-images-container">
+                    ${mediaHtml}
+                </div>
+                <button class="modal-nav-btn next" aria-label="Next">
+                    <svg viewBox="0 0 24 24" width="48" height="48" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                </button>
+            </div>
+            `;
+        } else {
+            galleryHtml = `
+            <div class="modal-images" id="modal-images-container">
+                ${mediaHtml}
+            </div>
+            `;
+        }
+
         modalBody.innerHTML = `
             ${tagsHtml}
             <h2 class="modal-title">${work.title}</h2>
             <div class="modal-desc">${work.description}</div>
+            ${linksHtml}
             ${paginationHtml}
-            <div class="modal-images" id="modal-images-container">
-                ${mediaHtml}
-            </div>
+            ${galleryHtml}
         `;
         
         modal.classList.add('active');
@@ -243,16 +278,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (mediaCount > 1) {
             const dots = document.querySelectorAll('.modal-pagination-dot');
+            const prevBtn = document.querySelector('.modal-nav-btn.prev');
+            const nextBtn = document.querySelector('.modal-nav-btn.next');
+
+            const scrollToSlide = (index) => {
+                if (index < 0) index = mediaCount - 1;
+                else if (index >= mediaCount) index = 0;
+                const scrollAmount = modalImagesContainer.clientWidth * index;
+                modalImagesContainer.scrollTo({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            };
 
             dots.forEach((dot, index) => {
-                dot.addEventListener('click', () => {
-                    const scrollAmount = modalImagesContainer.clientWidth * index;
-                    modalImagesContainer.scrollTo({
-                        left: scrollAmount,
-                        behavior: 'smooth'
-                    });
-                });
+                dot.addEventListener('click', () => scrollToSlide(index));
             });
+
+            if (prevBtn && nextBtn) {
+                prevBtn.addEventListener('click', () => {
+                    const currentIndex = Math.round(modalImagesContainer.scrollLeft / modalImagesContainer.clientWidth);
+                    scrollToSlide(currentIndex - 1);
+                });
+                nextBtn.addEventListener('click', () => {
+                    const currentIndex = Math.round(modalImagesContainer.scrollLeft / modalImagesContainer.clientWidth);
+                    scrollToSlide(currentIndex + 1);
+                });
+            }
 
             modalImagesContainer.addEventListener('scroll', () => {
                 const scrollLeft = modalImagesContainer.scrollLeft;
@@ -264,6 +316,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 updateHeight();
             });
+
+            let isScrolling = false;
+            modalImagesContainer.addEventListener('wheel', (e) => {
+                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                    e.preventDefault();
+                    if (isScrolling) return;
+                    
+                    const currentIndex = Math.round(modalImagesContainer.scrollLeft / modalImagesContainer.clientWidth);
+                    if (e.deltaY > 0) {
+                        scrollToSlide(currentIndex + 1);
+                    } else if (e.deltaY < 0) {
+                        scrollToSlide(currentIndex - 1);
+                    }
+                    
+                    isScrolling = true;
+                    setTimeout(() => { isScrolling = false; }, 500);
+                }
+            }, { passive: false });
         }
 
         if (mediaCount > 0) {

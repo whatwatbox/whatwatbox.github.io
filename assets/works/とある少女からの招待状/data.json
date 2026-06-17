@@ -1,0 +1,27 @@
+{
+  "id": "とある少女からの招待状",
+  "isPublic": true,
+  "title": "とある少女からの招待状",
+  "tags": [
+    "Metaverse",
+    "cluster"
+  ],
+  "summary": "「バーチャル広島駅おもしろ活用コンテスト」用謎解き",
+  "description": "■ 作品概要\n「バーチャル広島駅活用コンテスト」用に作成した謎解きです。\nバーチャル広島駅のワールドの一部を謎解きに利用しました。\n\n■ 実績\nおもしろ活用コンテストグランプリ受賞",
+  "links": [
+    {
+      "text": "謎一覧",
+      "url": "https://docs.google.com/presentation/d/1TCaGcfmF7pEvVKOGu7o-hPc-J5EODQ8th5fwDuJKitk/edit?usp=sharing"
+    },
+    {
+      "text": "公式ページ",
+      "url": "https://www.jr-odekake.net/navi/virtual-station/hiroshima/info_250314_04.html"
+    }
+  ],
+  "media": [
+    {
+      "type": "image",
+      "src": "アートボード1.jpg"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "Chevalierワンマンライブ",
+  "isPublic": true,
+  "title": "Chevalier様ワンマンライブ",
+  "tags": [
+    "Metaverse",
+    "cluster",
+    "VRChat",
+    "Event",
+    "Live"
+  ],
+  "summary": "ワンマンライブ会場/演出",
+  "description": "■ 作品概要\ncluster/VRChatで行われたChevalier様のワンマンライブの会場のモデリング、演出を担当しました。\n\n■ コンセプト：オペラ座のようなステージ\nChevalier様からオペラ座のような会場が良いとの要望があり、それを参考にライブ用のサイズ感でデザインしました。\nまた、曲ごとに世界観が大きく変わるため、背景や演出なども合わせたものにしました。\n\n■ 技術的な挑戦\n今回、コンセプトデザインやテクスチャにAIを使用しました。\n初回打ち合わせの際にある程度の認識合わせが円滑に進んだので良い試みでした。\n演出に関しては、複数の曲で演者を際立たせながらMVの再現を行うなどの挑戦をしてみました。\nまた、VRChat公演では、clusterのイベントシステムなどをUdonギミックとして再現することに挑戦しました。\nイベント当日はトラブルもなく円滑に遂行することができました。\n\n■ こだわり\nこの頃、clusterでもリアルタイムライトで影を出せるようになったため、\nシルエットを意識した演出を色々と組み込みました。\n\n■ 実績\n【初回　Chevalier　first-one man live -Cantaria-】\n会場：cluster\n開催日：2025/05/17\n延べ来場者数：250\nいいね数：115\n\n【再演　Chevalier one man live -Cantaria-】\n会場：cluster\n開催日：2025/6/21\n延べ来場者数：97\nいいね数：59\n\n【再演　Chevalier one man live -Cantaria-】\n会場：VRChat\n開催日：2026/2/16\n\n\n",
+  "links": [
+    {
+      "text": "#Cantaria",
+      "url": "https://x.com/hashtag/Cantaria"
+    },
+    {
+      "text": "#Cantaria_VRC",
+      "url": "https://x.com/hashtag/Cantaria_VRC"
+    }
+  ],
+  "media": [
+    {
+      "type": "youtube",
+      "id": "4N7UGRGFUhg"
+    },
+    {
+      "type": "image",
+      "src": "アートボード5.jpg"
+    },
+    {
+      "type": "image",
+      "src": "アートボード1.jpg"
+    },
+    {
+      "type": "image",
+      "src": "アートボード4.jpg"
+    },
+    {
+      "type": "image",
+      "src": "アートボード3.jpg"
+    },
+    {
+      "type": "image",
+      "src": "スライス1.jpg"
+    },
+    {
+      "type": "image",
+      "src": "アートボード2.jpg"
+    }
+  ]
+}
