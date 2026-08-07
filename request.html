@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request | WATBOX</title>
+    <meta name="description" content="WATBOX (W@) - メタバースワールド・ギミック等の制作ご依頼・料金表">
+    <link rel="icon" href="assets/images/WatImages/WATBOX_A_1024_B.png" type="image/png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=M+PLUS+2:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        .request-intro {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 4rem auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+        }
+
+        /* Simulator Layout */
+        .simulator-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2.5rem;
+            margin-bottom: 5rem;
+            align-items: start;
+        }
+
+        .simulator-section {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .simulator-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            border-left: 3px solid var(--text-color);
+            padding-left: 0.8rem;
+        }
+
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Option Card Styles */
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .option-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .option-item input[type="radio"],
+        .option-item input[type="checkbox"] {
+            margin-top: 0.25rem;
+            accent-color: var(--text-color);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .option-details {
+            flex: 1;
+        }
+
+        .option-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.3rem;
+        }
+
+        .option-name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .option-price {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 1.05rem;
+        }
+
+        .option-desc-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Active Option State */
+        .option-item.selected {
+            border-color: var(--text-color);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Estimation Card */
+        .estimation-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2.5rem 2rem;
+            position: sticky;
+            top: 100px;
+            backdrop-filter: blur(10px);
+        }
+
+        .estimation-card h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .total-price {
+            font-size: 2.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .breakdown-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .breakdown-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 2rem;
+            max-height: 250px;
+            overflow-y: auto;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .breakdown-list li {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .est-disclaimer {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-scroll-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 1rem;
+            background: var(--text-color);
+            color: var(--bg-color);
+            font-weight: 600;
+            border: 1px solid var(--text-color);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .contact-scroll-btn:hover {
+            background: transparent;
+            color: var(--text-color);
+        }
+
+        @media (max-width: 992px) {
+            .simulator-container {
+                grid-template-columns: 1fr;
+            }
+
+            .estimation-card {
+                position: static;
+            }
+        }
+
+        /* Workflow */
+        .workflow-section {
+            background: rgba(255, 255, 255, 0.01);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 6rem 0;
+            margin-bottom: 5rem;
+        }
+
+        .workflow-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin: 3rem auto 0 auto;
+            max-width: 800px;
+        }
+
+        .workflow-item-new {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+        }
+
+        .workflow-item-new:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .workflow-item-new .step-num-new {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-color);
+            line-height: 1;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.5rem 0.7rem;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .workflow-item-content {
+            flex: 1;
+        }
+
+        .workflow-item-content h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .workflow-item-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Precautions Section */
+        .precautions-section {
+            margin-top: 5rem;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 3rem 2.5rem;
+        }
+
+        .precautions-section h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .precaution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 3rem;
+        }
+
+        .precaution-group h4 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            color: var(--text-color);
+            border-left: 3px solid var(--text-color);
+            padding-left: 0.8rem;
+        }
+
+        .precaution-group ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .precaution-group li {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.8rem;
+            position: relative;
+            padding-left: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .precaution-group li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: var(--text-color);
+        }
+
+        /* Specific Examples */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 6rem;
+        }
+
+        .example-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .example-item h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .example-item ul {
+            list-style: none;
+        }
+
+        .example-item li {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .example-item li::before {
+            content: "✔";
+            position: absolute;
+            left: 0;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Back Button */
+        .back-btn-wrapper {
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        @media (max-width: 768px) {
+            .price-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header" id="header">
+        <div class="header-inner">
+            <h1 class="logo"><a href="index.html#home"><img src="assets/images/WatImages/WATBOX_C_1024_W.png"
+                        alt="WATBOX" style="height: 28px; vertical-align: middle;"></a></h1>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#works">Works</a></li>
+                    <li><a href="request.html">Request</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding-top: 80px;">
+        <!-- Intro Section -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Request</h2>
+                <p class="section-desc">ご依頼について・料金目安</p>
+
+                <p class="request-intro">
+                    clusterやVRChatなどのメタバースイベント会場、オリジナルギミック、演出用シェーダー等の制作を承っております。<br>
+                    記載の料金・納期は目安となります。ご予算や要件に合わせて柔軟にプランをご提案しますので、まずはお気軽にご相談ください。<br>
+                    <span
+                        style="color: #ffaa00; font-size: 0.95rem; display: block; margin-top: 1rem;">※時期や受注状況などにより、料金目安が変動する場合がございます。あらかじめご了承ください。</span>
+                    <span
+                        style="color: #ffaa00; font-size: 0.95rem; display: block; margin-top: 0.5rem;">※法人のお客様からのご依頼につきましては、本料金表・見積もり概算に関わらず個別お見積もりとなりますので、別途お問い合わせください。</span>
+                </p>
+
+                <!-- Estimation Simulator -->
+                <div class="simulator-container">
+                    <div class="simulator-left">
+                        <div class="simulator-section">
+                            <h3>1. 空間・ワールドサイズを選択</h3>
+                            <div id="world-options" class="options-group">
+                                <p style="font-size: 0.9rem; color: var(--text-muted);">料金データを読み込んでいます…</p>
+                            </div>
+                        </div>
+
+                        <div class="simulator-section">
+                            <h3>2. 追加ギミックを選択</h3>
+                            <div id="gimmick-options" class="options-group">
+                                <p style="font-size: 0.9rem; color: var(--text-muted);">料金データを読み込んでいます…</p>
+                            </div>
+                        </div>
+
+                        <div class="simulator-section">
+                            <h3>3. ライブ演出（一曲ごとの料金・複数選択可）</h3>
+                            <div id="effect-options" class="options-group">
+                                <p style="font-size: 0.9rem; color: var(--text-muted);">料金データを読み込んでいます…</p>
+                            </div>
+                        </div>
+
+                        <div class="simulator-section">
+                            <h3>4. その他オプション（複数選択可）</h3>
+                            <div id="option-options" class="options-group">
+                                <p style="font-size: 0.9rem; color: var(--text-muted);">料金データを読み込んでいます…</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="simulator-right">
+                        <div class="estimation-card">
+                            <h4>お見積もり概算 (目安)</h4>
+                            <div class="total-price" id="total-price">¥0</div>
+                            <div class="breakdown-title">選択した構成内訳:</div>
+                            <ul class="breakdown-list" id="breakdown-list">
+                                <li style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+                                    選択した項目がここに表示されます</li>
+                            </ul>
+                            <p class="est-disclaimer">
+                                ※こちらは目安の概算料金となります。詳細仕様やご予算に合わせ調整可能です。また、法人のお客様からのご依頼は個別お見積もりとなりますので、別途お問い合わせください。</p>
+                            <a href="#contact-form-section" id="contact-scroll-btn" class="contact-scroll-btn">この構成で問い合わせる</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Specific Examples -->
+                <h3 class="section-title" style="font-size: 1.8rem; text-align: center; margin-bottom: 1rem;">対応可能な具体例
+                </h3>
+                <p class="section-desc" style="text-align: center; margin-bottom: 3rem;">具体例と対応可能範囲</p>
+
+                <div class="examples-grid">
+                    <div class="example-item">
+                        <h4>ワールド・空間</h4>
+                        <ul>
+                            <li>企業展示会・個展ブース</li>
+                            <li>ライブ会場・DJクラブ会場</li>
+                            <li>ファンミーティング・交流用ハウス</li>
+                            <li>ゲームワールド</li>
+                        </ul>
+                    </div>
+                    <div class="example-item">
+                        <h4>ギミック・機能</h4>
+                        <ul>
+                            <li>イベントスタッフシステム</li>
+                            <li>クラフトアイテムのスクリプト実装</li>
+                            <li>アバターギミック</li>
+                            <li>カメラ制御ギミック</li>
+                        </ul>
+                    </div>
+                    <div class="example-item">
+                        <h4>エフェクト・その他</h4>
+                        <ul>
+                            <li>音楽イベント用ライティング演出</li>
+                            <li>エディタ拡張ツールの制作</li>
+                            <li>ワールドのプラットフォーム移行対応</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Workflow Section -->
+        <section class="workflow-section">
+            <div class="container">
+                <h3 class="section-title" style="font-size: 1.8rem; text-align: center; margin-bottom: 1rem;">ご依頼の流れ
+                </h3>
+                <p class="section-desc" style="text-align: center; margin-bottom: 3rem;">Workflow</p>
+
+                <div class="workflow-list">
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">01</span>
+                        <div class="workflow-item-content">
+                            <h4>見積もり依頼</h4>
+                            <p>本ページ下部のお見積もり専用フォームより受け付けております。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">02</span>
+                        <div class="workflow-item-content">
+                            <h4>Discordサーバーへのご案内</h4>
+                            <p>ご依頼内容の相談や詳細進行を行うための専用チャンネルを作成し、ご案内いたします。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">03</span>
+                        <div class="workflow-item-content">
+                            <h4>依頼内容ヒアリング</h4>
+                            <p>詳しい仕様、ご希望の納期、ご予算などについて確認・すり合わせを行います。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">04</span>
+                        <div class="workflow-item-content">
+                            <h4>お見積書の作成・ご提示</h4>
+                            <p>ヒアリングした仕様に基づき、正式なお見積書を作成して提示いたします。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">05</span>
+                        <div class="workflow-item-content">
+                            <h4>正式発注・契約完了</h4>
+                            <p>お見積書の内容にご同意いただけましたら、契約完了となり、制作に着手いたします。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">06</span>
+                        <div class="workflow-item-content">
+                            <h4>制作・プロジェクト進行</h4>
+                            <p>Discordにて適宜進捗を共有いたします。イベントスタッフ参加などもこの段階で対応します。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">07</span>
+                        <div class="workflow-item-content">
+                            <h4>仮納品・検収</h4>
+                            <p>Unitypackage形式等のデータ提出、またはテスト環境にて動作確認を行っていただきます。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">08</span>
+                        <div class="workflow-item-content">
+                            <h4>修正対応</h4>
+                            <p>仮納品より7日間の無料修正期間を設けており、不具合修正や調整に対応します。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">09</span>
+                        <div class="workflow-item-content">
+                            <h4>正式納品</h4>
+                            <p>検収完了後、最終的な完成データを正式に納品いたします。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">10</span>
+                        <div class="workflow-item-content">
+                            <h4>請求書の発行</h4>
+                            <p>正式納品の完了後に、制作費用の請求書を発行いたします。</p>
+                        </div>
+                    </div>
+                    <div class="workflow-item-new fade-in">
+                        <span class="step-num-new">11</span>
+                        <div class="workflow-item-content">
+                            <h4>お支払い</h4>
+                            <p>請求書発行日より原則14日以内に、指定の方法（Stripe等）にてご入金をお願いいたします。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Precautions Section -->
+                <div class="precautions-section fade-in">
+                    <h3>注意事項</h3>
+                    <div class="precaution-grid">
+                        <div class="precaution-group">
+                            <h4>【修正・不具合対応について】</h4>
+                            <ul>
+                                <li><strong>無料修正期間</strong>：仮納品後7日間（動作確認・検収期間）</li>
+                                <li><strong>無料対象</strong>：事前に合意した仕様に基づく不具合・バグの修正、微調整</li>
+                                <li><strong>有料対象</strong>：仮納品後の仕様変更、追加のご依頼、および納品後7日経過後のご連絡</li>
+                            </ul>
+                        </div>
+                        <div class="precaution-group">
+                            <h4>【お支払いについて】</h4>
+                            <ul>
+                                <li><strong>お支払い期限</strong>：請求書発行後、原則14日以内にご入金をお願いいたします。</li>
+                                <li><strong>法人・組織のお客様</strong>：締め日・支払日の規定がある場合は、事前のヒアリング時にご相談ください。規定に合わせて柔軟に対応可能です。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Form Section -->
+        <section class="section" id="contact-form-section">
+            <div class="container">
+                <h3 class="section-title" style="font-size: 1.8rem; text-align: center; margin-bottom: 1rem;">
+                    ご相談・お見積もりフォーム</h3>
+                <p class="section-desc" style="text-align: center; margin-bottom: 3rem;">Inquiry Form</p>
+
+                <div class="form-wrapper">
+                    <iframe
+                        src="https://docs.google.com/forms/d/e/1FAIpQLSetL8yP-VBk1jfy1G3uvMmdNMFW40eUhTHVxHQehn2k8yt_rw/viewform?embedded=true"
+                        width="100%" height="2483" frameborder="0" marginheight="0" marginwidth="0"
+                        style="background:#1a1a1a; border-radius: 8px;">読み込んでいます…</iframe>
+                </div>
+
+                <div class="back-btn-wrapper">
+                    <a href="index.html" class="back-btn">Top Page</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>
+            &copy; 2026 WATBOX (W@). All Rights Reserved. |
+            <a href="tokushouho.html" style="text-decoration: underline; margin-left: 10px;">特定商取引法に基づく表記</a>
+        </p>
+    </footer>
+    <!-- Scripts -->
+    <script src="js/works-list.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const worldContainer = document.getElementById('world-options');
+            const gimmickContainer = document.getElementById('gimmick-options');
+            const effectContainer = document.getElementById('effect-options');
+            const optionContainer = document.getElementById('option-options');
+
+            const totalPriceEl = document.getElementById('total-price');
+            const breakdownListEl = document.getElementById('breakdown-list');
+
+            let priceData = null;
+
+            try {
+                const response = await fetch('assets/request/prices.json');
+                if (!response.ok) throw new Error('Failed to load prices');
+                priceData = await response.json();
+
+                renderOptions();
+                calculateEstimate();
+            } catch (error) {
+                console.error(error);
+                const errorMsg = '<p style="font-size: 0.9rem; color: #ff5555;">料金データの読み込みに失敗しました。</p>';
+                worldContainer.innerHTML = errorMsg;
+                gimmickContainer.innerHTML = errorMsg;
+                effectContainer.innerHTML = errorMsg;
+                optionContainer.innerHTML = errorMsg;
+            }
+
+            function renderOptions() {
+                // 1. World Sizes (Radio)
+                worldContainer.innerHTML = priceData.worldSizes.map((item, idx) => `
+                    <label class="option-item ${idx === 0 ? 'selected' : ''}" data-type="world">
+                        <input type="radio" name="world-size" value="${item.id}" ${idx === 0 ? 'checked' : ''}>
+                        <div class="option-details">
+                            <div class="option-title-row">
+                                <span class="option-name">${item.name}</span>
+                                <span class="option-price">${item.price === 0 ? '無料' : '¥' + item.price.toLocaleString() + '〜'}</span>
+                            </div>
+                            <div class="option-desc-text">${item.desc}</div>
+                        </div>
+                    </label>
+                `).join('');
+
+                // 2. Gimmicks (Radio)
+                gimmickContainer.innerHTML = priceData.gimmicks.map((item, idx) => `
+                    <label class="option-item ${idx === 0 ? 'selected' : ''}" data-type="gimmick">
+                        <input type="radio" name="gimmick" value="${item.id}" ${idx === 0 ? 'checked' : ''}>
+                        <div class="option-details">
+                            <div class="option-title-row">
+                                <span class="option-name">${item.name}</span>
+                                <span class="option-price">${item.price === 0 ? '無料' : '+¥' + item.price.toLocaleString() + '〜'}</span>
+                            </div>
+                            <div class="option-desc-text">${item.desc}</div>
+                        </div>
+                    </label>
+                `).join('');
+
+                // 3. Effects (Checkbox with Quantity)
+                effectContainer.innerHTML = priceData.effects.map(item => `
+                    <div class="option-item-wrapper" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label class="option-item" data-type="checkbox">
+                            <input type="checkbox" name="effect" value="${item.id}">
+                            <div class="option-details">
+                                <div class="option-title-row">
+                                    <span class="option-name">${item.name}</span>
+                                    <span class="option-price">+¥${item.price.toLocaleString()}〜 / 曲</span>
+                                </div>
+                                <div class="option-desc-text">${item.desc}</div>
+                            </div>
+                        </label>
+                        <div class="quantity-selector-container" style="display: none; align-items: center; gap: 0.5rem; padding-left: 2.8rem; margin-top: -0.5rem; margin-bottom: 0.5rem;">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">曲数:</span>
+                            <input type="number" class="quantity-input" data-effect-id="${item.id}" value="1" min="1" max="20" style="width: 60px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 0.2rem 0.5rem; text-align: center;">
+                        </div>
+                    </div>
+                `).join('');
+
+                // 4. Options (Checkbox)
+                optionContainer.innerHTML = priceData.options.map(item => `
+                    <label class="option-item" data-type="checkbox">
+                        <input type="checkbox" name="option" value="${item.id}">
+                        <div class="option-details">
+                            <div class="option-title-row">
+                                <span class="option-name">${item.name}</span>
+                                <span class="option-price">+¥${item.price.toLocaleString()}〜</span>
+                            </div>
+                            <div class="option-desc-text">${item.desc}</div>
+                        </div>
+                    </label>
+                `).join('');
+
+                // Add event listeners
+                document.querySelectorAll('.option-item input').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const label = e.target.closest('.option-item');
+                        if (e.target.type === 'radio') {
+                            const name = e.target.name;
+                            document.querySelectorAll(`label[data-type="${name === 'world-size' ? 'world' : 'gimmick'}"]`).forEach(l => l.classList.remove('selected'));
+                            label.classList.add('selected');
+                        } else {
+                            const wrapper = e.target.closest('.option-item-wrapper');
+                            const qtyContainer = wrapper?.querySelector('.quantity-selector-container');
+                            if (e.target.checked) {
+                                label.classList.add('selected');
+                                if (qtyContainer) qtyContainer.style.display = 'flex';
+                            } else {
+                                label.classList.remove('selected');
+                                if (qtyContainer) {
+                                    qtyContainer.style.display = 'none';
+                                    const qtyInput = qtyContainer.querySelector('.quantity-input');
+                                    if (qtyInput) qtyInput.value = 1;
+                                }
+                            }
+                        }
+                        calculateEstimate();
+                    });
+                });
+
+                // Add quantity input listeners
+                document.querySelectorAll('.quantity-input').forEach(input => {
+                    input.addEventListener('change', () => {
+                        calculateEstimate();
+                    });
+                    input.addEventListener('input', () => {
+                        calculateEstimate();
+                    });
+                });
+            }
+
+            function updateEffectsState() {
+                const mediumGimmickChecked = document.querySelector('input[value="gimmick_medium"]')?.checked;
+                const largeGimmickChecked = document.querySelector('input[value="gimmick_large"]')?.checked;
+                const isEnabled = mediumGimmickChecked || largeGimmickChecked;
+
+                const effectInputs = document.querySelectorAll('input[name="effect"]');
+                effectInputs.forEach(input => {
+                    input.disabled = !isEnabled;
+                    const label = input.closest('.option-item');
+                    const wrapper = input.closest('.option-item-wrapper');
+                    const qtyContainer = wrapper?.querySelector('.quantity-selector-container');
+                    
+                    if (!isEnabled) {
+                        input.checked = false;
+                        label.classList.remove('selected');
+                        label.style.opacity = '0.3';
+                        label.style.pointerEvents = 'none';
+                        if (qtyContainer) {
+                            qtyContainer.style.display = 'none';
+                            const qtyInput = qtyContainer.querySelector('.quantity-input');
+                            if (qtyInput) qtyInput.value = 1;
+                        }
+                    } else {
+                        label.style.opacity = '1';
+                        label.style.pointerEvents = 'auto';
+                    }
+                });
+
+                const noticeId = 'effects-notice';
+                let noticeEl = document.getElementById(noticeId);
+                if (!isEnabled) {
+                    if (!noticeEl) {
+                        noticeEl = document.createElement('p');
+                        noticeEl.id = noticeId;
+                        noticeEl.style.fontSize = '0.85rem';
+                        noticeEl.style.color = '#ffaa00';
+                        noticeEl.style.marginTop = '1rem';
+                        noticeEl.textContent = '※演出項目を選択するには、「中規模ギミック」または「大規模ギミック」の選択が必要です。';
+                        effectContainer.appendChild(noticeEl);
+                    }
+                } else {
+                    if (noticeEl) {
+                        noticeEl.remove();
+                    }
+                }
+            }
+
+            function calculateEstimate() {
+                if (!priceData) return;
+
+                updateEffectsState();
+
+                let total = 0;
+                const breakdown = [];
+
+                // Get selected world size
+                const selectedWorldId = document.querySelector('input[name="world-size"]:checked')?.value;
+                const worldItem = priceData.worldSizes.find(w => w.id === selectedWorldId);
+                if (worldItem) {
+                    total += worldItem.price;
+                    if (worldItem.price > 0) {
+                        breakdown.push({ name: worldItem.name, price: worldItem.price });
+                    }
+                }
+
+                // Get selected gimmick
+                const selectedGimmickId = document.querySelector('input[name="gimmick"]:checked')?.value;
+                const gimmickItem = priceData.gimmicks.find(g => g.id === selectedGimmickId);
+                if (gimmickItem) {
+                    total += gimmickItem.price;
+                    if (gimmickItem.price > 0) {
+                        breakdown.push({ name: gimmickItem.name, price: gimmickItem.price });
+                    }
+                }
+
+                // Get checked checkboxes (effects and options)
+                const checkedInputs = document.querySelectorAll('.options-group input[type="checkbox"]:checked');
+                checkedInputs.forEach(input => {
+                    const id = input.value;
+                    const name = input.name;
+                    let item = null;
+                    if (name === 'effect') {
+                        item = priceData.effects.find(e => e.id === id);
+                        if (item) {
+                            const qtyInput = document.querySelector(`.quantity-input[data-effect-id="${id}"]`);
+                            const qty = parseInt(qtyInput?.value || 1, 10);
+                            const itemTotal = item.price * qty;
+                            total += itemTotal;
+                            breakdown.push({ name: `${item.name} (${qty}曲)`, price: itemTotal });
+                        }
+                    } else if (name === 'option') {
+                        item = priceData.options.find(o => o.id === id);
+                        if (item) {
+                            total += item.price;
+                            breakdown.push({ name: item.name, price: item.price });
+                        }
+                    }
+                });
+
+                // Update total
+                totalPriceEl.textContent = '¥' + total.toLocaleString() + '〜';
+
+                // Update breakdown list
+                if (breakdown.length === 0) {
+                    breakdownListEl.innerHTML = '<li style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">選択した項目がここに表示されます</li>';
+                } else {
+                    breakdownListEl.innerHTML = breakdown.map(item => `
+                        <li>
+                            <span>${item.name}</span>
+                            <span>¥${item.price.toLocaleString()}〜</span>
+                        </li>
+                    `).join('');
+                }
+            }
+            // Inquiry button click handler to prefill Google Form
+            const contactBtn = document.getElementById('contact-scroll-btn');
+            const formIframe = document.querySelector('#contact-form-section iframe');
+
+            if (contactBtn && formIframe) {
+                contactBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (!priceData) return;
+
+                    // Construct prefill text
+                    let text = "【お見積もり概算構成（シミュレーター選択値）】\n";
+
+                    const selectedWorldId = document.querySelector('input[name="world-size"]:checked')?.value;
+                    const worldItem = priceData.worldSizes.find(w => w.id === selectedWorldId);
+                    if (worldItem && worldItem.price > 0) {
+                        text += `・空間・ワールドサイズ: ${worldItem.name} (¥${worldItem.price.toLocaleString()}〜)\n`;
+                    }
+
+                    const selectedGimmickId = document.querySelector('input[name="gimmick"]:checked')?.value;
+                    const gimmickItem = priceData.gimmicks.find(g => g.id === selectedGimmickId);
+                    if (gimmickItem && gimmickItem.price > 0) {
+                        text += `・追加ギミック: ${gimmickItem.name} (+¥${gimmickItem.price.toLocaleString()}〜)\n`;
+                    }
+
+                    const checkedInputs = document.querySelectorAll('.options-group input[type="checkbox"]:checked');
+                    checkedInputs.forEach(input => {
+                        const id = input.value;
+                        const name = input.name;
+                        if (name === 'effect') {
+                            const item = priceData.effects.find(e => e.id === id);
+                            if (item) {
+                                const qtyInput = document.querySelector(`.quantity-input[data-effect-id="${id}"]`);
+                                const qty = parseInt(qtyInput?.value || 1, 10);
+                                text += `・ライブ演出: ${item.name} (${qty}曲) (+¥${(item.price * qty).toLocaleString()}〜)\n`;
+                            }
+                        } else if (name === 'option') {
+                            const item = priceData.options.find(o => o.id === id);
+                            if (item) {
+                                text += `・その他オプション: ${item.name} (+¥${item.price.toLocaleString()}〜)\n`;
+                            }
+                        }
+                    });
+
+                    const totalText = totalPriceEl.textContent;
+                    text += `・見積もり合計（目安）: ${totalText}`;
+
+                    // Base URL of the Google Form
+                    const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSetL8yP-VBk1jfy1G3uvMmdNMFW40eUhTHVxHQehn2k8yt_rw/viewform?embedded=true";
+                    // Prefill entry.101699816 ("見積もり選択項目")
+                    const prefilledUrl = `${baseUrl}&entry.101699816=${encodeURIComponent(text)}`;
+
+                    // Update iframe src to load prefilled form
+                    formIframe.src = prefilledUrl;
+
+                    // Smooth scroll to form section
+                    document.getElementById('contact-form-section').scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
