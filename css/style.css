@@ -665,6 +665,24 @@ img {
     color: var(--text-color);
 }
 
+.request-cta-btn-outline {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.request-cta-btn-outline:hover {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .hero-inner {

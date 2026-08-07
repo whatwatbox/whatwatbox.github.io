@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service | WATBOX</title>
+    <meta name="description" content="WATBOX (W@) - メタバース空間・ライブ演出ギミック制作サービス詳細">
+    <link rel="icon" href="assets/images/WatImages/WATBOX_A_1024_B.png" type="image/png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=M+PLUS+2:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Hero section styling */
+        .promo-hero {
+            text-align: center;
+            padding: 8rem 0 4rem 0;
+            background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.03), transparent 60%);
+        }
+
+        .promo-hero h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .promo-hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* Story cards container */
+        .story-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6rem;
+            margin: 4rem auto 8rem auto;
+            max-width: 1000px;
+            padding: 0 1.5rem;
+        }
+
+        .story-card {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .story-card:nth-child(even) {
+            grid-template-columns: 1fr 1.2fr;
+        }
+
+        .story-card:nth-child(even) .story-image-wrapper {
+            order: 2;
+        }
+
+        .story-card:nth-child(even) .story-content-wrapper {
+            order: 1;
+        }
+
+        .story-image-wrapper {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            aspect-ratio: 16 / 10;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s ease, border-color 0.4s ease;
+        }
+
+        .story-image-wrapper:hover {
+            transform: scale(1.02);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .story-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .story-image-wrapper:hover img {
+            transform: scale(1.05);
+        }
+
+        .story-content-wrapper h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+
+        .story-content-wrapper h3::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 2px;
+            background: var(--text-color);
+            margin-top: 0.8rem;
+        }
+
+        .story-content-wrapper p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        /* Bottom CTA Section */
+        .promo-cta-section {
+            background: rgba(255, 255, 255, 0.01);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 6rem 0;
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .promo-cta-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .promo-cta-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .promo-cta-card h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .promo-cta-card p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        .promo-cta-btn {
+            display: inline-block;
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 1.2rem 3rem;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .promo-cta-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive styling */
+        @media (max-width: 768px) {
+            .promo-hero {
+                padding: 6rem 1.5rem 3rem 1.5rem;
+            }
+
+            .promo-hero h2 {
+                font-size: 1.8rem;
+            }
+
+            .promo-hero p {
+                font-size: 1rem;
+            }
+
+            .story-container {
+                gap: 4rem;
+                margin-bottom: 5rem;
+            }
+
+            .story-card {
+                grid-template-columns: 1fr !important;
+                gap: 2rem;
+            }
+
+            .story-card:nth-child(even) .story-image-wrapper {
+                order: 1;
+            }
+
+            .story-card:nth-child(even) .story-content-wrapper {
+                order: 2;
+            }
+
+            .story-content-wrapper h3 {
+                font-size: 1.4rem;
+            }
+
+            .promo-cta-card {
+                padding: 3rem 1.5rem;
+                margin: 0 1.5rem;
+            }
+
+            .promo-cta-card h3 {
+                font-size: 1.5rem;
+            }
+
+            .promo-cta-card p {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header" id="header">
+        <div class="header-inner">
+            <h1 class="logo"><a href="index.html#home"><img src="assets/images/WatImages/WATBOX_C_1024_W.png"
+                        alt="WATBOX" style="height: 28px; vertical-align: middle;"></a></h1>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#skills">Skills</a></li>
+                    <li><a href="index.html#works">Works</a></li>
+                    <li><a href="service.html">Service</a></li>
+                    <li><a href="request.html">Request</a></li>
+                    <li><a href="index.html#links">Links</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding-top: 80px;">
+        <!-- Hero Section -->
+        <section class="promo-hero">
+            <div class="container">
+                <h2>心躍るライブ演出と、<br>没入感溢れるワールド制作</h2>
+                <p>想像を形にし、メタバース空間に新しい体験を創り出します。<br>メタバース（cluster / VRChat等）における演出ギミック開発・空間構築など。</p>
+            </div>
+        </section>
+
+        <!-- Feature Story Sections -->
+        <section class="container">
+            <div class="story-container">
+                <!-- Story Card 1 -->
+                <div class="story-card">
+                    <div class="story-image-wrapper">
+                        <img src="assets/images/Service_Stage.jfif" alt="次世代のライブ空間・ワールド構築">
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3>ライブ空間・ワールド構築</h3>
+                        <p>DJクラブイベント、音楽ライブ、個展・展示会ブースなど、メタバースのあらゆるコンセプトに応じたワールド空間を設計・制作します。</p>
+                    </div>
+                </div>
+
+                <!-- Story Card 2 -->
+                <div class="story-card">
+                    <div class="story-image-wrapper">
+                        <img src="assets/images/Service_Puzzle.jfif" alt="インタラクティブなギミック開発">
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3>インタラクティブなギミック開発</h3>
+                        <p>イベントに便利なスタッフ管理システム、企画などに使えるミニゲームシステムなど、体験を飽きさせないギミックを実装します。体験をより豊かにするギミックを実装します。</p>
+                    </div>
+                </div>
+
+                <!-- Story Card 3 -->
+                <div class="story-card">
+                    <div class="story-image-wrapper">
+                        <img src="assets/images/Service_Live.jfif" alt="音楽と同期するステージ・VFX演出">
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3>音楽と同期するステージ・VFX演出</h3>
+                        <p>楽曲進行に合わせた高度なライト演出、Timeline制御、視界をジャックするエフェクト、空間全体を変形させる特殊演出など、ライブイベントを劇的に引き立てる演出システムを制作します。一曲ごとに同期した特別な感動を創り出します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom CTA Section -->
+        <section class="promo-cta-section">
+            <div class="container">
+                <div class="promo-cta-card">
+                    <h3>あなただけの仮想世界を、共に創り上げましょう。</h3>
+                    <p>具体的な料金見積もりや、構成のシミュレーションはこちらから行えます。</p>
+                    <a href="request.html" class="promo-cta-btn">ご依頼・見積もりシミュレーターへ</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>
+            &copy; 2026 WATBOX (W@). All Rights Reserved. |
+            <a href="tokushouho.html" style="text-decoration: underline; margin-left: 10px;">特定商取引法に基づく表記</a>
+        </p>
+    </footer>
+</body>
+
+</html>
