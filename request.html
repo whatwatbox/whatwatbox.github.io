@@ -395,6 +395,139 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Request Status Banner */
+        .request-status-container {
+            max-width: 800px;
+            margin: 0 auto 2.5rem auto;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .status-dot.active {
+            background-color: #00ffaa;
+            box-shadow: 0 0 10px #00ffaa;
+        }
+
+        .status-dot.inactive {
+            background-color: #ff5555;
+            box-shadow: 0 0 10px #ff5555;
+        }
+
+        .status-pulse {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: pulse-animation 2s infinite ease-in-out;
+            z-index: 1;
+        }
+
+        .status-pulse.active {
+            background-color: #00ffaa;
+        }
+
+        .status-pulse.inactive {
+            background-color: #ff5555;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.6);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+        }
+
+        .status-content {
+            flex: 1;
+        }
+
+        .status-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            display: block;
+        }
+
+        .status-label.active {
+            color: #00ffaa;
+        }
+
+        .status-label.inactive {
+            color: #ff5555;
+        }
+
+        .status-message {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+
+        /* Disabled elements style when requests are closed */
+        .contact-scroll-btn.disabled {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .form-disabled-message {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-muted);
+            margin: 2rem 0;
+        }
+
+        .form-disabled-message h4 {
+            font-size: 1.3rem;
+            color: #ffaa00;
+            margin-bottom: 1rem;
+        }
+
+        .form-disabled-message p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
     </style>
 </head>
 
@@ -424,6 +557,9 @@
             <div class="container">
                 <h2 class="section-title">Request</h2>
                 <p class="section-desc">ご依頼について・料金目安</p>
+
+                <!-- Status Area -->
+                <div id="request-status-container"></div>
 
                 <p class="request-intro">
                     clusterやVRChatなどのメタバースイベント会場、オリジナルギミック、演出用シェーダー等の制作を承っております。<br>
@@ -667,6 +803,7 @@
     <script src="js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            const statusContainer = document.getElementById('request-status-container');
             const worldContainer = document.getElementById('world-options');
             const gimmickContainer = document.getElementById('gimmick-options');
             const effectContainer = document.getElementById('effect-options');
@@ -684,6 +821,7 @@
 
                 renderOptions();
                 calculateEstimate();
+                applyRequestStatus();
             } catch (error) {
                 console.error(error);
                 const errorMsg = '<p style="font-size: 0.9rem; color: #ff5555;">料金データの読み込みに失敗しました。</p>';
@@ -908,6 +1046,53 @@
                     `).join('');
                 }
             }
+
+            function applyRequestStatus() {
+                if (!priceData || !priceData.status) return;
+
+                const status = priceData.status;
+                const isAccepting = status.accepting;
+
+                // Render status banner
+                statusContainer.innerHTML = `
+                    <div class="request-status-container">
+                        <div class="status-indicator">
+                            <div class="status-dot ${isAccepting ? 'active' : 'inactive'}"></div>
+                            <div class="status-pulse ${isAccepting ? 'active' : 'inactive'}"></div>
+                        </div>
+                        <div class="status-content">
+                            <span class="status-label ${isAccepting ? 'active' : 'inactive'}">
+                                ${isAccepting ? 'Request Available' : 'Request Suspended'}
+                            </span>
+                            <p class="status-message">${isAccepting ? status.message : status.disabledMessage}</p>
+                        </div>
+                    </div>
+                `;
+
+                // If not accepting, disable submission but keep simulator active
+                if (!isAccepting) {
+                    // 1. Disable the "contact this estimation" button
+                    const contactBtn = document.getElementById('contact-scroll-btn');
+                    if (contactBtn) {
+                        contactBtn.classList.add('disabled');
+                        contactBtn.textContent = 'ただいま受付を停止しております';
+                        contactBtn.href = '#';
+                        contactBtn.style.pointerEvents = 'none'; // Click prevention
+                    }
+
+                    // 2. Hide Google Form and show fallback message
+                    const formWrapper = document.querySelector('.form-wrapper');
+                    if (formWrapper) {
+                        formWrapper.innerHTML = `
+                            <div class="form-disabled-message">
+                                <h4>新規お見積もり・ご相談受付の停止中</h4>
+                                <p>${status.disabledMessage || '現在ご依頼の受付を一時停止しております。再開までしばらくお待ちください。'}</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
             // Inquiry button click handler to prefill Google Form
             const contactBtn = document.getElementById('contact-scroll-btn');
             const formIframe = document.querySelector('#contact-form-section iframe');

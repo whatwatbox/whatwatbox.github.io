@@ -1,4 +1,9 @@
 {
+  "status": {
+    "accepting": true,
+    "message": "現在、新規のご依頼を受け付けております。(納期目安：ご相談ください)",
+    "disabledMessage": "ただいま大変多くのご依頼をいただいており、新規受付を一時停止しております。"
+  },
   "worldSizes": [
     { "id": "world_none", "name": "なし", "desc": "ワールド制作を含まない（ギミックや演出のみなど）", "price": 0 },
     { "id": "world_small", "name": "ワールド(小)", "desc": "ワンルームや倉庫など、オブジェクトなし", "price": 20000 },
