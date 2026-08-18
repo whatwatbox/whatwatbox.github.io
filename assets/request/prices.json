@@ -6,6 +6,7 @@
   },
   "worldSizes": [
     { "id": "world_none", "name": "なし", "desc": "ワールド制作を含まない（ギミックや演出のみなど）", "price": 0 },
+    { "id": "world_modify", "name": "既存会場改変", "desc": "モデルデータ持ち込みなど、既存会場の改変・セットアップ", "price": 20000 },
     { "id": "world_small", "name": "ワールド(小)", "desc": "ワンルームや倉庫など、オブジェクトなし", "price": 20000 },
     { "id": "world_medium", "name": "ワールド(中)", "desc": "集会場や複数部屋に分かれた部屋など、オブジェクトは少量", "price": 30000 },
     { "id": "world_large", "name": "ワールド(大)", "desc": "ライブ会場やDJ会場など、オブジェクト多数", "price": 40000 }
@@ -17,10 +18,10 @@
     { "id": "gimmick_large", "name": "大規模ギミック", "desc": "ミニゲームシステム、謎解きシステムなど", "price": 20000 }
   ],
   "effects": [
-    { "id": "effect_simple", "name": "簡易ライブ演出", "desc": "ボタンによる手動制御", "price": 0 },
-    { "id": "effect_small", "name": "曲専用ステージ演出(小)", "desc": "ライトの動き、パーティクルなど", "price": 3000 },
-    { "id": "effect_medium", "name": "曲専用ステージ演出(中)", "desc": "視界ジャックやオブジェクト操作など", "price": 5000 },
-    { "id": "effect_large", "name": "曲専用ステージ演出(大)", "desc": "会場変形など特殊演出", "price": 10000 }
+    { "id": "effect_simple", "name": "演出なし", "desc": "固定ライトなど", "price": 0 },
+    { "id": "effect_small", "name": "ステージ演出(小)", "desc": "ライトの動き、パーティクルなど", "price": 3000 },
+    { "id": "effect_medium", "name": "ステージ演出(中)", "desc": "視界ジャックやオブジェクト操作など", "price": 5000 },
+    { "id": "effect_large", "name": "ステージ演出(大)", "desc": "会場変形など特殊演出", "price": 10000 }
   ],
   "options": [
     { "id": "opt_porting", "name": "プラットフォーム移植・対応", "desc": "VRChat ↔ Cluster 相互移植など", "price": 20000 }

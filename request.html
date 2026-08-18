@@ -524,9 +524,25 @@
             margin-bottom: 1rem;
         }
 
-        .form-disabled-message p {
-            font-size: 0.95rem;
-            line-height: 1.6;
+        /* Hide administrative text area by default */
+        .admin-text-output {
+            display: none;
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #00ffaa;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.5rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            resize: none;
+        }
+
+        .estimation-card.admin-mode .admin-text-output {
+            display: block;
         }
     </style>
 </head>
@@ -604,7 +620,7 @@
 
                     <div class="simulator-right">
                         <div class="estimation-card">
-                            <h4>お見積もり概算 (目安)</h4>
+                            <h4 id="est-card-title" style="cursor: pointer; user-select: none;">お見積もり概算 (目安)</h4>
                             <div class="total-price" id="total-price">¥0</div>
                             <div class="breakdown-title">選択した構成内訳:</div>
                             <ul class="breakdown-list" id="breakdown-list">
@@ -613,6 +629,7 @@
                             </ul>
                             <p class="est-disclaimer">
                                 ※こちらは目安の概算料金となります。詳細仕様やご予算に合わせ調整可能です。また、法人のお客様からのご依頼は個別お見積もりとなりますので、別途お問い合わせください。</p>
+                            <textarea id="admin-text-output" class="admin-text-output" readonly></textarea>
                             <a href="#contact-form-section" id="contact-scroll-btn" class="contact-scroll-btn">この構成で問い合わせる</a>
                         </div>
                     </div>
@@ -846,19 +863,28 @@
                     </label>
                 `).join('');
 
-                // 2. Gimmicks (Radio)
-                gimmickContainer.innerHTML = priceData.gimmicks.map((item, idx) => `
-                    <label class="option-item ${idx === 0 ? 'selected' : ''}" data-type="gimmick">
-                        <input type="radio" name="gimmick" value="${item.id}" ${idx === 0 ? 'checked' : ''}>
-                        <div class="option-details">
-                            <div class="option-title-row">
-                                <span class="option-name">${item.name}</span>
-                                <span class="option-price">${item.price === 0 ? '無料' : '+¥' + item.price.toLocaleString() + '〜'}</span>
+                // 2. Gimmicks (Checkbox with Quantity)
+                gimmickContainer.innerHTML = priceData.gimmicks.map((item, idx) => {
+                    if (item.id === 'gimmick_none') return ''; // 'なし' option is no longer needed for checkboxes
+                    return `
+                        <div class="option-item-wrapper" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label class="option-item" data-type="checkbox">
+                                <input type="checkbox" name="gimmick" value="${item.id}">
+                                <div class="option-details">
+                                    <div class="option-title-row">
+                                        <span class="option-name">${item.name}</span>
+                                        <span class="option-price">+¥${item.price.toLocaleString()}〜 / 個</span>
+                                    </div>
+                                    <div class="option-desc-text">${item.desc}</div>
+                                </div>
+                            </label>
+                            <div class="quantity-selector-container" style="display: none; align-items: center; gap: 0.5rem; padding-left: 2.8rem; margin-top: -0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">個数:</span>
+                                <input type="number" class="quantity-input" data-gimmick-id="${item.id}" value="1" min="1" max="20" style="width: 60px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; padding: 0.2rem 0.5rem; text-align: center;">
                             </div>
-                            <div class="option-desc-text">${item.desc}</div>
                         </div>
-                    </label>
-                `).join('');
+                    `;
+                }).join('');
 
                 // 3. Effects (Checkbox with Quantity)
                 effectContainer.innerHTML = priceData.effects.map(item => `
@@ -900,7 +926,7 @@
                         const label = e.target.closest('.option-item');
                         if (e.target.type === 'radio') {
                             const name = e.target.name;
-                            document.querySelectorAll(`label[data-type="${name === 'world-size' ? 'world' : 'gimmick'}"]`).forEach(l => l.classList.remove('selected'));
+                            document.querySelectorAll(`label[data-type="world"]`).forEach(l => l.classList.remove('selected'));
                             label.classList.add('selected');
                         } else {
                             const wrapper = e.target.closest('.option-item-wrapper');
@@ -997,23 +1023,22 @@
                     }
                 }
 
-                // Get selected gimmick
-                const selectedGimmickId = document.querySelector('input[name="gimmick"]:checked')?.value;
-                const gimmickItem = priceData.gimmicks.find(g => g.id === selectedGimmickId);
-                if (gimmickItem) {
-                    total += gimmickItem.price;
-                    if (gimmickItem.price > 0) {
-                        breakdown.push({ name: gimmickItem.name, price: gimmickItem.price });
-                    }
-                }
-
-                // Get checked checkboxes (effects and options)
+                // Get checked checkboxes (gimmicks, effects and options)
                 const checkedInputs = document.querySelectorAll('.options-group input[type="checkbox"]:checked');
                 checkedInputs.forEach(input => {
                     const id = input.value;
                     const name = input.name;
                     let item = null;
-                    if (name === 'effect') {
+                    if (name === 'gimmick') {
+                        item = priceData.gimmicks.find(g => g.id === id);
+                        if (item) {
+                            const qtyInput = document.querySelector(`.quantity-input[data-gimmick-id="${id}"]`);
+                            const qty = parseInt(qtyInput?.value || 1, 10);
+                            const itemTotal = item.price * qty;
+                            total += itemTotal;
+                            breakdown.push({ name: `${item.name} (${qty}個)`, price: itemTotal });
+                        }
+                    } else if (name === 'effect') {
                         item = priceData.effects.find(e => e.id === id);
                         if (item) {
                             const qtyInput = document.querySelector(`.quantity-input[data-effect-id="${id}"]`);
@@ -1044,6 +1069,43 @@
                             <span>¥${item.price.toLocaleString()}〜</span>
                         </li>
                     `).join('');
+                }
+
+                // Update administrative text area value unconditionally so it is always current
+                let text = "【お見積もり概算構成（シミュレーター選択値）】\n";
+                if (worldItem && worldItem.price > 0) {
+                    text += `・空間・ワールドサイズ: ${worldItem.name} (¥${worldItem.price.toLocaleString()}〜)\n`;
+                }
+
+                checkedInputs.forEach(input => {
+                    const id = input.value;
+                    const name = input.name;
+                    if (name === 'gimmick') {
+                        const item = priceData.gimmicks.find(g => g.id === id);
+                        if (item) {
+                            const qtyInput = document.querySelector(`.quantity-input[data-gimmick-id="${id}"]`);
+                            const qty = parseInt(qtyInput?.value || 1, 10);
+                            text += `・追加ギミック: ${item.name} (${qty}個) (+¥${(item.price * qty).toLocaleString()}〜)\n`;
+                        }
+                    } else if (name === 'effect') {
+                        const item = priceData.effects.find(e => e.id === id);
+                        if (item) {
+                            const qtyInput = document.querySelector(`.quantity-input[data-effect-id="${id}"]`);
+                            const qty = parseInt(qtyInput?.value || 1, 10);
+                            text += `・ライブ演出: ${item.name} (${qty}曲) (+¥${(item.price * qty).toLocaleString()}〜)\n`;
+                        }
+                    } else if (name === 'option') {
+                        const item = priceData.options.find(o => o.id === id);
+                        if (item) {
+                            text += `・その他オプション: ${item.name} (+¥${item.price.toLocaleString()}〜)\n`;
+                        }
+                    }
+                });
+
+                text += `・見積もり合計（目安）: ${totalPriceEl.textContent}`;
+                const adminTextOutput = document.getElementById('admin-text-output');
+                if (adminTextOutput) {
+                    adminTextOutput.value = text;
                 }
             }
 
@@ -1093,6 +1155,16 @@
                 }
             }
 
+            // Register double-click listener on estimation card title
+            const estCardTitle = document.getElementById('est-card-title');
+            const estCardElement = document.querySelector('.estimation-card');
+            if (estCardTitle && estCardElement) {
+                estCardTitle.addEventListener('dblclick', () => {
+                    estCardElement.classList.toggle('admin-mode');
+                    calculateEstimate(); // Refresh values & text output when toggled
+                });
+            }
+
             // Inquiry button click handler to prefill Google Form
             const contactBtn = document.getElementById('contact-scroll-btn');
             const formIframe = document.querySelector('#contact-form-section iframe');
@@ -1111,17 +1183,18 @@
                         text += `・空間・ワールドサイズ: ${worldItem.name} (¥${worldItem.price.toLocaleString()}〜)\n`;
                     }
 
-                    const selectedGimmickId = document.querySelector('input[name="gimmick"]:checked')?.value;
-                    const gimmickItem = priceData.gimmicks.find(g => g.id === selectedGimmickId);
-                    if (gimmickItem && gimmickItem.price > 0) {
-                        text += `・追加ギミック: ${gimmickItem.name} (+¥${gimmickItem.price.toLocaleString()}〜)\n`;
-                    }
-
                     const checkedInputs = document.querySelectorAll('.options-group input[type="checkbox"]:checked');
                     checkedInputs.forEach(input => {
                         const id = input.value;
                         const name = input.name;
-                        if (name === 'effect') {
+                        if (name === 'gimmick') {
+                            const item = priceData.gimmicks.find(g => g.id === id);
+                            if (item) {
+                                const qtyInput = document.querySelector(`.quantity-input[data-gimmick-id="${id}"]`);
+                                const qty = parseInt(qtyInput?.value || 1, 10);
+                                text += `・追加ギミック: ${item.name} (${qty}個) (+¥${(item.price * qty).toLocaleString()}〜)\n`;
+                            }
+                        } else if (name === 'effect') {
                             const item = priceData.effects.find(e => e.id === id);
                             if (item) {
                                 const qtyInput = document.querySelector(`.quantity-input[data-effect-id="${id}"]`);
