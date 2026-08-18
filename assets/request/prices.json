@@ -1,6 +1,6 @@
 {
   "status": {
-    "accepting": true,
+    "accepting": false,
     "message": "現在、新規のご依頼を受け付けております。(納期目安：ご相談ください)",
     "disabledMessage": "ただいま大変多くのご依頼をいただいており、新規受付を一時停止しております。"
   },
