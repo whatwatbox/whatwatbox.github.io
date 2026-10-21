@@ -1,4 +1,18 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Keep the homepage aligned with the status managed by the existing editor.
+    const requestStatus = document.getElementById('request-status');
+    if (requestStatus) {
+        fetch('assets/request/prices.json').then(response => {
+            if (!response.ok) throw new Error('受付状況を取得できませんでした');
+            return response.json();
+        }).then(data => {
+            requestStatus.dataset.status = data.status.accepting ? 'accepting' : 'suspended';
+            requestStatus.textContent = data.status.accepting ? data.status.message : data.status.disabledMessage;
+            if (!data.status.accepting) {
+                document.getElementById('request-link').textContent = '料金目安・受付状況を見る ↗';
+            }
+        }).catch(() => { requestStatus.dataset.status = 'unknown'; requestStatus.textContent = '最新の受付状況は、ご依頼ページでご確認ください。'; });
+    }
     // 1. Fade-in animation on scroll
     const fadeElements = document.querySelectorAll('.fade-in');
     
@@ -25,11 +39,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modal = document.getElementById('work-modal');
     const modalBody = document.getElementById('modal-body');
     const modalClose = document.querySelector('.modal-close');
+    // Service and request pages reuse this script without the work gallery.
+    if (!worksContainer || !modal || !modalBody || !modalClose) return;
     
     let slideshowIntervals = {};
     let loadedWorks = [];
     let allTags = new Set();
     let currentResizeHandler = null;
+    let previousFocus = null;
+    let closeTimer = null;
 
     if (typeof worksFolders !== 'undefined' && worksContainer) {
         for (let i = 0; i < worksFolders.length; i++) {
@@ -73,6 +91,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function createWorkCard(work, folderPath, index) {
         const card = document.createElement('div');
         card.className = 'work-card fade-in';
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `${work.title}の制作詳細を見る`);
         card.dataset.index = index;
         
         const imagesDiv = document.createElement('div');
@@ -81,6 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         work.images.forEach((imgSrc, imgIndex) => {
             const img = document.createElement('img');
             img.src = imgSrc;
+            img.loading = 'lazy';
             img.alt = `${work.title} - Image ${imgIndex + 1}`;
             if (imgIndex === 0) img.classList.add('active');
             imagesDiv.appendChild(img);
@@ -126,6 +148,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.addEventListener('click', () => {
             openModal(work);
         });
+        card.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openModal(work);
+            }
+        });
         
         worksContainer.appendChild(card);
         setTimeout(() => { observer.observe(card); }, 100);
@@ -138,7 +166,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const allBtn = document.createElement('button');
         allBtn.className = 'filter-btn active';
-        allBtn.textContent = 'All';
+        allBtn.textContent = 'すべて';
+        allBtn.setAttribute('aria-pressed', 'true');
         allBtn.dataset.tag = 'all';
         filtersContainer.appendChild(allBtn);
         
@@ -146,24 +175,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.createElement('button');
             btn.className = 'filter-btn';
             btn.textContent = tag;
+            btn.setAttribute('aria-pressed', 'false');
             btn.dataset.tag = tag;
             filtersContainer.appendChild(btn);
         });
         
         filtersContainer.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                filtersContainer.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                filtersContainer.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-pressed', 'false');
+                });
                 e.target.classList.add('active');
+                e.target.setAttribute('aria-pressed', 'true');
                 
                 const selectedTag = e.target.dataset.tag;
                 
                 loadedWorks.forEach(item => {
                     if (selectedTag === 'all' || item.work.tags.includes(selectedTag)) {
                         item.card.style.display = 'block';
-                        setTimeout(() => { item.card.style.opacity = '1'; }, 10);
+                        item.card.style.opacity = '1';
                     } else {
                         item.card.style.opacity = '0';
-                        setTimeout(() => { item.card.style.display = 'none'; }, 300);
+                        item.card.style.display = 'none';
                     }
                 });
             });
@@ -172,6 +206,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Modal Logic
     function openModal(work) {
+        clearTimeout(closeTimer);
+        previousFocus = document.activeElement;
+        if (currentResizeHandler) window.removeEventListener('resize', currentResizeHandler);
         let mediaHtml = '';
         let mediaCount = 0;
         if (work.media && work.media.length > 0) {
@@ -261,6 +298,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         
         modal.classList.add('active');
+        modal.inert = false;
+        modal.setAttribute('aria-hidden', 'false');
+        modalClose.focus();
         document.body.style.overflow = 'hidden';
 
         const modalImagesContainer = document.getElementById('modal-images-container');
@@ -357,12 +397,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function closeModal() {
         modal.classList.remove('active');
+        modal.inert = true;
+        modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
+        if (previousFocus) previousFocus.focus();
         if (currentResizeHandler) {
             window.removeEventListener('resize', currentResizeHandler);
             currentResizeHandler = null;
         }
-        setTimeout(() => {
+        closeTimer = setTimeout(() => {
             modalBody.innerHTML = '';
         }, 400);
     }
@@ -376,6 +419,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     
     document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab' && modal.classList.contains('active')) {
+            const focusable = Array.from(modal.querySelectorAll('button, a[href], iframe')).filter(el => el.getClientRects().length);
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
         if (e.key === 'Escape' && modal.classList.contains('active')) {
             closeModal();
         }
