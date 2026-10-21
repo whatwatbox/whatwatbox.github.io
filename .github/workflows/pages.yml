@@ -1,0 +1,89 @@
+name: Publish site and PR previews
+
+on:
+  push:
+    branches: [main]
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, synchronize, closed, edited]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Rebuild all open previews, so coalescing pending runs cannot lose a PR update.
+concurrency:
+  group: watbox-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      previews: ${{ steps.site.outputs.previews }}
+    steps:
+      # Always run trusted main code. PR code is copied as static files only.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Assemble production and all open PR previews
+        id: site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/build_pages.py
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+
+  comment:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Update preview links after successful publication
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          PREVIEWS: ${{ needs.build.outputs.previews }}
+        with:
+          script: |
+            const marker = '<!-- watbox-pr-preview -->';
+            const previews = JSON.parse(process.env.PREVIEWS);
+            const update = async (number, body) => {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                ...context.repo, issue_number: number, per_page: 100
+              });
+              const existing = comments.find(c => c.user?.login === 'github-actions[bot]' && c.body?.includes(marker));
+              if (existing) {
+                if (existing.body !== body) await github.rest.issues.updateComment({
+                  ...context.repo, comment_id: existing.id, body
+                });
+              } else {
+                await github.rest.issues.createComment({...context.repo, issue_number: number, body});
+              }
+            };
+            for (const preview of previews) {
+              await update(preview.number, `${marker}\n### PRプレビュー\n\nhttps://watbox.net/pr-preview/pr-${preview.number}/\n\n反映済みコミット: \`${preview.sha}\`\n\nPR更新時に自動更新され、マージ・クローズ後に削除されます。`);
+            }
+            const closed = context.payload.pull_request;
+            if (context.payload.action === 'closed' && closed && !previews.some(p => p.number === closed.number)) {
+              await update(closed.number, `${marker}\nPRがクローズされたため、プレビューを削除しました。`);
+            }
