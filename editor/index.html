@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Works Editor - whatwatbox</title>
+    <title>作品管理 | WATBOX</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=M+PLUS+2:wght@300;400;600&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=M+PLUS+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/theme.css">
 </head>
-<body>
+<body class="editor-page">
     <div id="app">
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <h2>Works Editor</h2>
-                <button id="btn-open-dir" class="btn primary">Open Root Folder</button>
+                <a href="../index.html">← ポートフォリオを見る</a><h1>作品管理</h1>
+                <button id="btn-open-dir" class="btn primary">サイトのフォルダを開く</button>
                 <p class="help-text" style="margin-top:0.5rem; font-size:0.75rem;">(whatwatbox.github.ioを選択)</p>
             </div>
             <div class="sidebar-list sortable-list" id="works-list">
                 <!-- Works folders will be listed here -->
             </div>
             <div class="sidebar-footer">
-                <button id="btn-save-order" class="btn outline" style="margin-bottom: 0.5rem;" disabled>Save Display Order</button>
+                <button id="btn-save-order" class="btn outline" style="margin-bottom: 0.5rem;" disabled>表示順を保存</button>
                 <div style="display: flex; gap: 0.5rem;">
-                    <button id="btn-new-work" class="btn outline" disabled>+ New</button>
-                    <button id="btn-copy-work" class="btn outline" disabled>+ Copy</button>
+                    <button id="btn-new-work" class="btn outline" disabled>＋ 新規作品</button>
+                    <button id="btn-copy-work" class="btn outline" disabled>＋ 複製</button>
                 </div>
             </div>
         </div>
@@ -31,19 +33,19 @@
         <!-- Main Content (Editor Form) -->
         <div class="main-content">
             <div id="editor-empty" class="editor-empty">
-                <p>左側のメニューから「works」フォルダを開いてください。</p>
+                <p>「サイトのフォルダを開く」から whatwatbox.github.io を選択してください。作品を選ぶと、説明・画像・動画を編集できます。</p>
             </div>
 
             <div id="editor-form" class="editor-form hidden">
                 <div class="form-header">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <h3 style="margin: 0;">Editing: <span id="current-folder-name"></span></h3>
-                        <button id="btn-rename-folder" class="btn small outline" style="margin-left: 0.5rem;">Rename</button>
-                        <button id="btn-delete-folder" class="btn small danger">Delete</button>
+                        <h3 style="margin: 0;">編集中： <span id="current-folder-name"></span></h3>
+                        <button id="btn-rename-folder" class="btn small outline" style="margin-left: 0.5rem;">名前を変更</button>
+                        <button id="btn-delete-folder" class="btn small danger">削除</button>
                     </div>
-                    <button id="btn-save" class="btn primary">Save Changes</button>
+                    <button id="btn-save" class="btn primary">変更を保存</button>
                 </div>
-                
+
                 <div class="form-body">
                     <div class="section-box" style="margin-bottom: 2rem;">
                         <div class="form-group" style="display: flex; align-items: center; gap: 1rem;">
@@ -56,15 +58,15 @@
                             <input type="text" id="work-id" class="form-control" readonly style="opacity: 0.7;">
                         </div>
                         <div class="form-group">
-                            <label for="work-title">Title</label>
+                            <label for="work-title">作品名</label>
                             <input type="text" id="work-title" class="form-control">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Tags</label>
+                        <label>タグ</label>
                         <div id="tags-input-container" class="tags-input-container form-control">
                             <div id="tags-list" class="tags-list"></div>
-                            <input type="text" id="tag-input" placeholder="Type a tag and press Enter" list="tag-suggestions" autocomplete="off">
+                            <input type="text" id="tag-input" placeholder="タグを入力してEnter" list="tag-suggestions" autocomplete="off">
                             <datalist id="tag-suggestions"></datalist>
                         </div>
                     </div>
@@ -80,8 +82,8 @@
                     <!-- Links -->
                     <div class="form-group section-box">
                         <div class="section-header">
-                            <label>Links</label>
-                            <button id="btn-add-link" class="btn small">+ Add Link</button>
+                            <label>関連リンク</label>
+                            <button id="btn-add-link" class="btn small">＋ リンクを追加</button>
                         </div>
                         <div id="links-container" class="sortable-list"></div>
                     </div>
@@ -89,7 +91,7 @@
                     <!-- Media -->
                     <div class="form-group section-box">
                         <div class="section-header">
-                            <label>Media</label>
+                            <label>画像・動画</label>
                         </div>
                         <p class="help-text">※画像の項目に画像ファイルをドラッグ＆ドロップすると、フォルダに画像がコピーされ自動でファイル名が設定されます。</p>
                         <div id="media-container" class="sortable-list"></div>
@@ -98,7 +100,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Template for Link Item -->
     <template id="tpl-link-item">
         <div class="list-item link-item">
@@ -119,13 +121,13 @@
                     <option value="youtube">YouTube</option>
                     <option value="embed">Embed</option>
                 </select>
-                
+
                 <div class="media-input-wrapper">
                     <input type="text" class="media-val-image form-control" placeholder="Image Filename (e.g., 1.png)">
                     <input type="text" class="media-val-youtube form-control hidden" placeholder="YouTube Video ID (e.g., dQw4w9WgXcQ)">
                     <textarea class="media-val-embed form-control hidden" rows="2" placeholder="<iframe ...></iframe>"></textarea>
                 </div>
-                
+
                 <button class="btn danger small btn-remove-media">×</button>
             </div>
             <div class="media-preview" style="width: 100%; margin-top: 0.5rem; text-align: center; background: rgba(0,0,0,0.2); border-radius: 4px; min-height: 50px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #888; font-size: 0.85rem;"></div>

@@ -5,9 +5,9 @@
     --text-main: #f0f0f0;
     --text-muted: #aaaaaa;
     --border: #333333;
-    --accent: #4a90e2;
-    --accent-hover: #357abd;
-    --danger: #e24a4a;
+    --accent: #878787;
+    --accent-hover: #707070;
+    --danger: #6a6a6a;
 }
 
 * {
@@ -307,5 +307,3 @@ label {
     min-width: 150px;
     font-size: 0.9rem;
 }
-
-

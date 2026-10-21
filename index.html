@@ -1,208 +1,162 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WATBOX | W@ Portfolio</title>
-    <meta name="description" content="WATBOX (W@) - メタバースクリエイターのポートフォリオサイト">
-    <link rel="icon" href="assets/images/WatImages/WATBOX_A_1024_B.png" type="image/png">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=M+PLUS+2:wght@300;400;600&display=swap"
-        rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WATBOX | 空間・遊び・演出の3D制作</title>
+<meta name="description" content="WATBOX / W@。cluster・VRChatを中心に、イベント会場、謎解きやギミック、音楽に合わせたライブ演出を制作。">
+<link rel="icon" href="assets/images/WatImages/WATBOX_A_1024_B.png">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/portfolio.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=M+PLUS+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
 </head>
-
-<body>
-    <header class="header" id="header">
-        <div class="header-inner">
-            <h1 class="logo"><a href="#home"><img src="assets/images/WatImages/WATBOX_C_1024_W.png" alt="WATBOX"
-                        style="height: 28px; vertical-align: middle;"></a></h1>
-            <nav class="nav">
-                <ul class="nav-list">
-                    <li><a href="index.html#home">Home</a></li>
-                    <li><a href="index.html#about">About</a></li>
-                    <li><a href="index.html#skills">Skills</a></li>
-                    <li><a href="index.html#works">Works</a></li>
-                    <li><a href="service.html">Service</a></li>
-                    <li><a href="request.html">Request</a></li>
-                    <li><a href="index.html#links">Links</a></li>
-                    <li><a href="index.html#contact">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <main>
-        <!-- Home Section -->
-        <section id="home" class="section hero">
-            <div class="hero-inner fade-in">
-                <div class="hero-content">
-                    <h2 class="hero-title" style="letter-spacing: 5px;">WATBOX</h2>
-                    <p class="hero-subtitle">W@ | Space & Visual Creation</p>
-                </div>
-                <div class="hero-image">
-                    <img src="assets/images/WatImages/WATBOX_A_1024_W.png" alt="WATBOX Logo">
-                </div>
-            </div>
-            <div class="scroll-down">
-                <span>Scroll</span>
-                <div class="line"></div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="section about">
-            <div class="container">
-                <h2 class="section-title fade-in">About</h2>
-                <div class="about-content fade-in">
-                    <div class="about-image">
-                        <img src="assets/images/WatImages/W@.png" alt="W@ Profile Picture">
-                    </div>
-                    <div class="about-text">
-                        <p>初めまして。「WATBOX」の W@ と申します。</p>
-                        <p>主にcluster、VRChatを中心としたイベント企画、会場デザイン、ギミック制作などを行っています。</p>
-                        <div class="social-links">
-                            <a href="https://x.com/what_wat_" target="_blank" class="social-btn">X (Twitter)</a>
-                            <a href="https://cluster.mu/u/what_wat_" target="_blank" class="social-btn">Cluster</a>
-                            <a href="https://vrchat.com/home/user/usr_9f049c2a-a482-473b-a66d-4a63371c449f"
-                                target="_blank" class="social-btn">VRChat</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Skills Section -->
-        <section id="skills" class="section skills">
-            <div class="container">
-                <h2 class="section-title fade-in">Skills</h2>
-                <div class="skills-grid fade-in">
-                    <div class="skill-card">
-                        <h3>Unity / C#</h3>
-                        <p>ゲーム開発、エディタ拡張など</p>
-                    </div>
-                    <div class="skill-card">
-                        <h3>Metaverse / World & Gimmick</h3>
-                        <p>メタバースプラットフォーム向けのワールド制作、ギミック制作</p>
-                    </div>
-                    <div class="skill-card">
-                        <h3>Shader / Visual FX</h3>
-                        <p>演出のためのシェーダー開発、タイムライン制御、パーティクル表現</p>
-                    </div>
-                    <div class="skill-card">
-                        <h3>3D Modeling</h3>
-                        <p>Blender、SubstancePainterを用いた3Dモデルの制作</p>
-                    </div>
-                    <div class="skill-card">
-                        <h3>2D Design</h3>
-                        <p>Affinityを用いたサムネイルやロゴデザインの制作</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Works Section -->
-        <section id="works" class="section works">
-            <div class="container">
-                <h2 class="section-title fade-in">Works</h2>
-                <p class="section-desc fade-in">ホバーでプレビューをスライドショー表示、クリックで詳細をご覧いただけます。</p>
-
-                <div id="works-filters" class="works-filters fade-in">
-                    <!-- Filter buttons will be injected here -->
-                </div>
-
-                <div id="works-container" class="works-grid fade-in">
-                    <!-- JavaScript will inject works here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Links Section -->
-        <section id="links" class="section links">
-            <div class="container">
-                <h2 class="section-title fade-in">Links</h2>
-
-                <div class="contact-links fade-in">
-                    <a href="https://watbox.booth.pm/" target="_blank" class="contact-link-btn">
-                        <img src="assets/icons/booth_logo_icon_white.png" alt="Booth" class="contact-icon">
-                        <span class="contact-label">Booth</span>
-                    </a>
-                    <a href="https://www.youtube.com/channel/UCup_33QO6Newdy97DX_6NFA" target="_blank"
-                        class="contact-link-btn">
-                        <img src="https://cdn.simpleicons.org/youtube/white" alt="YouTube" class="contact-icon">
-                        <span class="contact-label">YouTube</span>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Request Section -->
-        <section id="request-cta" class="section request-cta">
-            <div class="container">
-                <div class="request-cta-card fade-in">
-                    <h2 class="section-title">Service & Request</h2>
-                    <p class="section-desc" style="margin-bottom: 2rem;">
-                        メタバースワールド制作、インタラクティブギミック、演出用シェーダー等の制作ご依頼を承っております。<br>
-                        当サービスの特徴やアピール、料金目安、ご依頼の流れについては詳細ページをご覧ください。
-                    </p>
-                    <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
-                        <a href="service.html" class="request-cta-btn-outline">特長・サービス紹介</a>
-                        <a href="request.html" class="request-cta-btn">ご依頼詳細・料金表</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="section contact">
-            <div class="container">
-                <h2 class="section-title fade-in">Contact</h2>
-                <p class="section-desc fade-in">その他のお問い合わせ・ご相談は以下のフォーム、またはXのDMよりお気軽にお問い合わせください。</p>
-
-                <div class="contact-links fade-in">
-                    <a href="https://x.com/" target="_blank" class="contact-link-btn">
-                        <img src="https://cdn.simpleicons.org/x/white" alt="X" class="contact-icon">
-                        <span class="contact-label">X (Twitter)</span>
-                    </a>
-                    <a href="mailto:whatwatbox+contact@gmail.com" class="contact-link-btn">
-                        <img src="https://cdn.simpleicons.org/gmail/white" alt="Mail" class="contact-icon">
-                        <span class="contact-label">whatwatbox+contact@gmail.com</span>
-                    </a>
-                </div>
-
-                <div class="contact-content fade-in">
-                    <div class="form-wrapper">
-                        <iframe
-                            src="https://docs.google.com/forms/d/e/1FAIpQLSf-o7zEuxneKTuDV2ruZQqD60VsyCxlhTqRI_0qo1rQRtYY5g/viewform?embedded=true"
-                            width="100%" height="978" frameborder="0" marginheight="0" marginwidth="0"
-                            style="background:#1a1a1a; border-radius: 8px;">読み込んでいます…</iframe>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <p>&copy; 2026 WATBOX (W@). All Rights Reserved. | <a href="tokushouho.html" style="text-decoration: underline; margin-left: 10px;">特定商取引法に基づく表記</a></p>
-    </footer>
-
-    <!-- Modal for Work Details -->
-    <div id="work-modal" class="modal">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <button class="modal-close" aria-label="Close modal">&times;</button>
-            <div class="modal-body" id="modal-body">
-                <!-- Injected by JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="js/works-list.js"></script>
-    <script src="js/main.js"></script>
+<body class="portfolio">
+<a class="skip-link" href="#main">本文へ移動</a>
+<header class="site-header">
+<a class="brand" href="#home"><img src="assets/images/WatImages/WATBOX_C_1024_W.png" alt="">WATBOX</a>
+<nav aria-label="メインナビゲーション">
+<a href="#works">制作実績</a>
+<a href="#services">できること</a>
+<a href="#about">W@について</a>
+<a class="nav-contact" href="#contact">制作の相談 ↗</a>
+</nav>
+</header>
+<main id="main">
+<section id="home" class="intro">
+<div class="intro-copy">
+<p class="eyebrow">W@ / SPACE, PLAY & VISUALS</p>
+<h1>空間に、<br>遊びと<span>驚き</span>を。</h1>
+<p class="intro-description">集まる場所から、記憶に残る体験へ。<br>3D空間、インタラクティブな仕掛け、<br>音楽とともに変わる演出をつくります。</p>
+<div class="intro-actions">
+<a class="button primary" href="#works">制作実績を見る ↓</a>
+<a class="text-link" href="#contact">制作について相談する ↗</a>
+</div>
+<p class="platforms">Unity / Blender / cluster / VRChat</p>
+</div>
+<figure class="intro-visual">
+<img src="assets/works/雪猫リン ワンマンライブ/アートボード2.jpg" alt="雪猫リン様ワンマンライブで制作したステージと光の演出" fetchpriority="high">
+<figcaption>
+<span>LIVE SPACE & DIRECTION</span>
+<a href="#works">雪猫リン様ワンマンライブ ↗</a>
+</figcaption>
+</figure>
+</section>
+<section id="works" class="content-section works-section">
+<div class="section-heading">
+<div>
+<p class="eyebrow">01 / WORKS</p>
+<h2>つくった空間。<br>そこで生まれる体験。</h2>
+</div>
+<p>ライブ、謎解き、参加型イベント。<br>各作品から、制作内容と担当範囲をご覧いただけます。</p>
+</div>
+<div class="featured-notes">
+<span>ライブ会場・曲ごとの演出</span>
+<span>非ユークリッド空間の謎解き</span>
+<span>参加者が遊べるイベントギミック</span>
+</div>
+<div id="works-filters" class="works-filters" aria-label="作品の絞り込み">
+</div>
+<div id="works-container" class="works-grid" aria-live="polite">
+</div>
+<noscript>
+<p>作品一覧の表示にはJavaScriptが必要です。<a href="https://www.youtube.com/channel/UCup_33QO6Newdy97DX_6NFA">YouTubeで制作動画を見る ↗</a>
+</p>
+</noscript>
+</section>
+<section id="services" class="content-section services-section">
+<div class="section-heading">
+<div>
+<p class="eyebrow">02 / WHAT I DO</p>
+<h2>空間も、仕掛けも、<br>その先の演出も。</h2>
+</div>
+<p>会場全体の制作から、ギミックや演出だけのご依頼まで。<br>イベントの内容に合わせて制作範囲をご相談いただけます。</p>
+</div>
+<div class="service-grid">
+<article>
+<span class="service-number">01 — SPACE</span>
+<h3>人が集まる空間</h3>
+<p>ライブ会場、DJ会場、展示・交流スペース。テーマに合わせたモデリングとライティングで、イベントの舞台をつくります。</p>
+<p class="service-example">会場デザイン / 3Dモデリング / ワールド制作</p>
+</article>
+<article>
+<span class="service-number">02 — PLAY</span>
+<h3>触れて、遊べる仕掛け</h3>
+<p>探索や謎解き、抽選ギミック、スタッフ用の操作機能。参加者の体験と、イベント進行を支える機能を実装します。</p>
+<p class="service-example">謎解き / インタラクション / 運営用ギミック</p>
+</article>
+<article>
+<span class="service-number">03 — VISUALS</span>
+<h3>音楽とともに変わる演出</h3>
+<p>曲に合わせた光やエフェクト、会場の変形、カメラ制御。バーチャル空間ならではの見せ方を組み立てます。</p>
+<p class="service-example">シェーダー / Timeline / ライティング演出</p>
+</article>
+</div>
+<div class="service-bottom">
+<p>イベント主催者・制作会社の方へ<br>
+<span>担当範囲、対象プラットフォーム、納期を伺い、対応可否とお見積もりをご案内します。</span>
+</p>
+<a class="text-link" href="service.html">サービスの詳細 ↗</a>
+<a class="text-link" href="request.html">料金目安・ご依頼の流れ ↗</a>
+</div>
+</section>
+<section id="about" class="content-section about-section">
+<div class="profile">
+<img src="assets/images/WatImages/W@.png" alt="W@のプロフィール画像" loading="lazy">
+<div>
+<p class="eyebrow">03 / ABOUT</p>
+<h2>W@</h2>
+<p>「WATBOX」として、cluster・VRChatを中心にイベント企画、会場デザイン、ギミック制作を行っています。現実ではできない空間や仕掛けを、実際に遊べる体験にすることが好きです。</p>
+<div class="profile-links">
+<a href="https://x.com/what_wat_" target="_blank" rel="noopener noreferrer">X ↗</a>
+<a href="https://cluster.mu/u/what_wat_" target="_blank" rel="noopener noreferrer">cluster ↗</a>
+<a href="https://vrchat.com/home/user/usr_9f049c2a-a482-473b-a66d-4a63371c449f" target="_blank" rel="noopener noreferrer">VRChat ↗</a>
+</div>
+</div>
+</div>
+<div id="skills" class="tools">
+<p class="eyebrow">TOOLS & SKILLS</p>
+<p>Unity / C# / Udon / Shader / Timeline<br>Blender / Substance Painter / Affinity</p>
+</div>
+</section>
+<section id="contact" class="content-section contact-section">
+<p class="eyebrow">04 / CONTACT</p>
+<h2>次の体験を、<br>一緒につくりませんか。</h2>
+<p>「こんなイベントをやりたい」という段階からご相談ください。<br>制作内容・ご希望の時期・対象プラットフォーム・ご予算を、分かる範囲でお知らせください。</p>
+<p id="request-status" class="request-status" aria-live="polite">
+</p>
+<div class="contact-actions">
+<a id="request-link" class="button primary" href="request.html">制作相談・お見積もり ↗</a>
+<a class="text-link" href="mailto:whatwatbox+contact@gmail.com">メールで相談する ↗</a>
+<a class="text-link" href="https://x.com/what_wat_" target="_blank" rel="noopener noreferrer">XのDM ↗</a>
+</div>
+<details class="contact-form">
+<summary>その他のお問い合わせフォームを開く</summary>
+<iframe title="WATBOX お問い合わせフォーム" loading="lazy" src="https://docs.google.com/forms/d/e/1FAIpQLSf-o7zEuxneKTuDV2ruZQqD60VsyCxlhTqRI_0qo1rQRtYY5g/viewform?embedded=true" width="100%" height="978">読み込んでいます…</iframe>
+</details>
+</section>
+</main>
+<footer class="site-footer">
+<a class="brand" href="#home"><img src="assets/images/WatImages/WATBOX_C_1024_W.png" alt="">WATBOX</a>
+<div id="links">
+<a href="https://watbox.booth.pm/" target="_blank" rel="noopener noreferrer">BOOTH ↗</a>
+<a href="https://www.youtube.com/channel/UCup_33QO6Newdy97DX_6NFA" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
+<a href="tokushouho.html">特定商取引法に基づく表記</a>
+</div>
+<small>© 2026 WATBOX / W@</small>
+</footer>
+<div id="work-modal" class="modal" role="dialog" aria-modal="true" aria-label="制作実績の詳細" aria-hidden="true" inert>
+<div class="modal-overlay">
+</div>
+<div class="modal-content">
+<button class="modal-close" aria-label="詳細を閉じる">×</button>
+<div class="modal-body" id="modal-body">
+</div>
+</div>
+</div>
+<script src="js/works-list.js">
+</script>
+<script src="js/main.js">
+</script>
 </body>
-
 </html>
