@@ -28,3 +28,6 @@ body{background:var(--bg-color);color:var(--text-color)}
 #request-status[data-status="accepting"]{color:#00ffaa}
 #request-status[data-status="suspended"]{color:#ff7777}
 #request-status[data-status="unknown"]{color:#ffaa00}
+.portfolio .site-header .brand-wordmark{flex-shrink:0}
+.portfolio .site-header .brand-wordmark img{display:block;width:142px;height:auto;filter:brightness(0) invert(1)}
+@media(max-width:640px){.portfolio .site-header .brand-wordmark img{width:115px}}
