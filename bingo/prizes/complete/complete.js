@@ -1,0 +1,4 @@
+import {submissionRequest,readSubmission} from '../submission-client.js';
+const $=id=>document.getElementById(id);
+async function init(){try{const response=await fetch('../prize-config.json',{cache:'no-store'});if(!response.ok)throw Error('設定を読み込めませんでした。');const config=await response.json(),saved=readSubmission();if(!saved?.statusToken)throw Error('この画面だけでは投稿完了を確認できません。Googleフォームの回答控えメールをご確認ください。');const status=await submissionRequest(config.imageUploadEndpoint,{action:'submissionStatus',statusToken:saved.statusToken});if(status.state!=='submitted')throw Error(status.state==='rejected'?status.message:'投稿完了をまだ確認できていません。Googleフォームでの送信をご確認ください。');$('completion-title').textContent='景品の投稿が完了しました';$('completion-message').textContent='ご提供ありがとうございます。';$('completion-details').hidden=false;}catch(error){$('completion-title').textContent='投稿状況をご確認ください';$('completion-message').textContent=error.message;}}
+init();

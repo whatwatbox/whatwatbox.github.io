@@ -1,0 +1,28 @@
+{
+  "accepting": true,
+  "periodText": "受付締切：2026年12月25日 23:59（日本時間）",
+  "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdVWm41QegZGT699BFvh9ueeXjFORZ5neglF5oiJ3Q5j5A0Sg/viewform",
+  "prefillTemplateUrl": "",
+  "metadataEndpoint": "https://script.google.com/macros/s/AKfycbwTMpK2JglIzZs4IfTgYbXGHPnyT8Lt_-_shxJvtZr66FVcKuTQow8KrfYYoVFKGZLw/exec",
+  "entries": {
+    "productName": "entry.821591514",
+    "productUrl": "entry.2070641263",
+    "shopName": "entry.1440226588",
+    "providerName": "entry.1401250411",
+    "description": "entry.1178041066",
+    "quantity": "",
+    "contact": "entry.588371272",
+    "awardName": "entry.948757758",
+    "price": "entry.392804672",
+    "clusterId": "entry.1271345603",
+    "category": "entry.1161008718",
+    "platform": "entry.322088700",
+    "thumbnailData": "",
+    "guestRequest": "entry.829993316",
+    "packData": "",
+    "internalData": "entry.1224734272",
+    "editId": "entry.413648623"
+  },
+  "giftMetadataEndpoint": "https://script.google.com/macros/s/AKfycbwTMpK2JglIzZs4IfTgYbXGHPnyT8Lt_-_shxJvtZr66FVcKuTQow8KrfYYoVFKGZLw/exec",
+  "imageUploadEndpoint": "https://script.google.com/macros/s/AKfycbx1iHBZOeodXb0zEd5VoSf4euAhLQD-xFithtg-xFUfErfgsT65EZx7-w3a7dt49NF_/exec"
+}
