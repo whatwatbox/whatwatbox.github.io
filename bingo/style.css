@@ -120,3 +120,9 @@ body { color: var(--ink); background: var(--cream); }
 .event-booking { flex-wrap:wrap; }
 .event-schedule-note { width:100%; order:3; margin-top:-10px; font-size:13px; color:#d0dae0; text-align:left; }
 @media(max-width:700px){.event-schedule-note { order:0; margin-top:-12px; text-align:center; font-size:12px; }}
+
+.supporters{border-top:1px solid var(--line);padding-top:55px}.supporters .section-title{margin-bottom:28px}.supporter-empty{display:flex;align-items:center;gap:35px;background:light-dark(#e3efea,#213d3e);border:1px dashed light-dark(#aac8bf,#557a75);border-radius:8px;padding:35px 40px}.supporter-empty .rosette{flex-shrink:0;--ink:#18364b;margin-bottom:25px}.supporter-empty p{font-size:14px;margin-bottom:12px}.supporter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.supporter-grid[hidden]{display:none}.supporter-entry{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:25px;gap:15px;text-align:center}.supporter-entry img{width:180px;height:85px;object-fit:contain}.supporter-entry span{font-size:15px;font-weight:700;overflow-wrap:anywhere}@media(max-width:700px){.supporter-empty{padding:25px 22px;gap:25px}.supporter-empty .rosette{scale:.75;margin-left:-10px;margin-right:-5px}.supporter-empty p{font-size:13px}.supporter-grid{grid-template-columns:1fr 1fr}.supporter-entry{padding:18px}.supporter-entry img{width:130px;height:65px}}
+.supporter-empty[hidden]{display:none}
+
+/* Navigation may include the prize catalog as well as submission links. */
+.site-header{flex-wrap:wrap}.site-header nav{flex-wrap:wrap}
