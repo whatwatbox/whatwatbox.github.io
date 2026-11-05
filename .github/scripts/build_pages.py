@@ -14,7 +14,7 @@ import tarfile
 from urllib.request import Request, urlopen
 
 
-PUBLIC_DIRS = {"assets", "css", "js", "editor"}
+PUBLIC_DIRS = {"assets", "css", "js", "editor", "bingo"}
 
 
 def git(*args):
