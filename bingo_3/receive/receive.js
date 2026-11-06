@@ -13,7 +13,7 @@ function show(result){
   });$('receipt-result').hidden=false;$('receipt-title').tabIndex=-1;$('receipt-title').focus();
 }
 $('receipt-form').addEventListener('submit',async event=>{
-  event.preventDefault();if(busy)return;$('receipt-result').hidden=true;$('receipt-products').replaceChildren();const code=normalizeReceiptCode($('receipt-code').value);
+  event.preventDefault();if(config.enabled!==true){status('現在、景品の受け取りは停止しています。');return;}if(busy)return;$('receipt-result').hidden=true;$('receipt-products').replaceChildren();const code=normalizeReceiptCode($('receipt-code').value);
   if(!/^[a-f0-9]{32}$/.test(code)){status('受取コードをすべてコピーして貼り付けてください。',true);return;}
   if(!config.endpoint){status('受け取りページは準備中です。W@へお問い合わせください。',true);return;}
   busy=true;$('receipt-submit').disabled=true;status('景品を確認しています…');
@@ -21,9 +21,9 @@ $('receipt-form').addEventListener('submit',async event=>{
     const url=new URL(config.endpoint);if(url.protocol!=='https:'||url.hostname!=='script.google.com'||!/^\/macros\/s\/[\w-]+\/exec$/.test(url.pathname))throw Error('接続先の設定をご確認ください。');
     const response=await fetch(url.href,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({code}),credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store',signal:AbortSignal.timeout(30000)});
     if(!response.ok)throw Error('接続できませんでした。時間をおいて再度お試しください。');
-    const raw=await response.json();if(raw.code==='LIMIT'||raw.code==='BUSY')throw Error('現在混み合っています。時間をおいて再度お試しください。');
+    const raw=await response.json();if(raw.code==='DISABLED'){config.enabled=false;$('receipt-code').disabled=true;throw Error('現在、景品の受け取りは停止しています。');}if(raw.code==='LIMIT'||raw.code==='BUSY')throw Error('現在混み合っています。時間をおいて再度お試しください。');
     show(validateReceipt(raw));status('景品を表示しました。');
-  }catch(error){status(error.name==='TimeoutError'?'確認に時間がかかっています。再度お試しください。':error.message,true);}finally{busy=false;$('receipt-submit').disabled=false;}
+  }catch(error){status(error.name==='TimeoutError'?'確認に時間がかかっています。再度お試しください。':error.message,true);}finally{busy=false;$('receipt-submit').disabled=config.enabled!==true;}
 });
 $('receipt-reset').onclick=()=>{$('receipt-result').hidden=true;$('receipt-products').replaceChildren();$('receipt-code').value='';status('');$('receipt-code').focus();};
-fetch('./receive-config.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(c=>{config=c;if(!config.endpoint)status('受け取りページは準備中です。');}).catch(()=>status('設定を読み込めませんでした。再読み込みしてください。',true));
+fetch('./receive-config.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(c=>{config=c;$('receipt-code').disabled=c.enabled!==true;$('receipt-submit').disabled=c.enabled!==true;if(c.enabled!==true)status('現在、景品の受け取りは停止しています。');else if(!config.endpoint)status('受け取りページは準備中です。');else status('');}).catch(()=>status('設定を読み込めませんでした。再読み込みしてください。',true));
