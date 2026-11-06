@@ -8,7 +8,7 @@ assert.equal(data.items.length,2);assert.equal(data.items[0].kind,'pack');assert
 assert.equal(data.items[1].id.length,22);for(const secret of ['secret@example.com','/gifts/','B3E-','受取コード','内部情報'])assert.ok(!JSON.stringify(data).includes(secret));
 assert.equal(filterPrizes(data.items,{category:'ギミック',platform:'Unity',kind:'pack',query:'同梱'}).length,1);assert.equal(filterPrizes(data.items,{query:'景品a'}).length,1);assert.equal(filterPrizes(data.items,{platform:'VRM'}).length,0);
 assert.equal(safeProductUrl('https://booth.pm/gifts/secret'),'');assert.equal(safeProductUrl('javascript:alert(1)'),'');assert.equal(safeProductUrl('https://evil.test/items/1'),'');assert.equal(safeProductUrl('https://shop.booth.pm/items/1?gift=x'),'');
-assert.throws(()=>c.catalogSafeText_('B3E-abcdef',100));assert.throws(()=>c.catalogBuild_({getDataRange:()=>({getValues:()=>[headers,...Array(1001).fill(valid)]})},()=>'',0));
+assert.throws(()=>c.catalogSafeText_('B3E-abcdef',100));assert.throws(()=>c.catalogSafeText_('B3-11111111-22222222-33333333-44444444',160));assert.throws(()=>c.catalogBuild_({getDataRange:()=>({getValues:()=>[headers,...Array(1001).fill(valid)]})},()=>'',0));
 console.log('Catalog sanitization, publication states, missing images, pack filtering, safe links and limits passed.');
 
 assert.equal(c.CATALOG_TTL_MS,60000);assert.equal(data.refreshSeconds,60);

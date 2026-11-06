@@ -5,7 +5,7 @@
  */
 var CATALOG_TTL_MS=60*1000;
 function catalogSource_(book){var sheets=book.getSheets().filter(function(s){if(!s.getLastRow())return false;var h=s.getRange(1,1,1,s.getLastColumn()).getValues()[0];return h.indexOf('投稿状態')>=0&&h.indexOf('景品名')>=0&&h.indexOf('内部情報')>=0;});if(sheets.length!==1)throw Error('SETUP');return sheets[0];}
-function catalogSafeText_(value,max){var s=String(value==null?'':value).trim();if(/booth\.pm\/gifts\/|B3[ES]-[a-f0-9-]+|bingo-image:|[^\s@]+@[^\s@]+\.[^\s@]+/i.test(s))throw Error('PRIVATE');return s.slice(0,max);}
+function catalogSafeText_(value,max){var s=String(value==null?'':value).trim();if(/booth\.pm\/gifts\/|B3(?:[ES]-[a-f0-9-]+|-[a-f0-9]{8}(?:-[a-f0-9]{8}){3})|bingo-image:|[^\s@]+@[^\s@]+\.[^\s@]+/i.test(s))throw Error('PRIVATE');return s.slice(0,max);}
 function catalogBuild_(sheet,loadImage,now){
  var rows=sheet.getDataRange().getValues(),headers=rows.shift(),items=[];
  if(rows.length>1000)throw Error('LIMIT');
