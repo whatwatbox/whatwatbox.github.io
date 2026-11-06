@@ -26,7 +26,7 @@ await fetch(cards()[0]).onclick();await fetch(cards()[1]).onclick();assert.equal
 await price(cards()[0]).input('');assert.equal(get('reference-price').value,'');assert.ok(editor.errors().some(s=>s.includes('参考価格')));
 await price(cards()[0]).input('-1');assert.equal(get('reference-price').value,'');assert.ok(editor.errors().some(s=>s.includes('参考価格')));
 await price(cards()[0]).input('0');assert.equal(get('reference-price').value,'500');assert.equal(editor.errors().length,0);
-await price(cards()[0]).input('600');const saved=editor.exportState();assert.deepEqual(saved.map(i=>i.id),[1,2]);
+await price(cards()[0]).input('600');const saved=editor.exportState();assert.equal(editor.giftUrls(),'https://booth.pm/gifts/a\nhttps://booth.pm/gifts/b');assert.ok(!JSON.stringify(saved).includes('/gifts/'));assert.deepEqual(saved.map(i=>i.id),[1,2]);
 await remove(cards()[1]).onclick();assert.equal(get('reference-price').value,'600');assert.ok(removed.includes('pack:2'));
 editor.restore(saved,['https://booth.pm/gifts/a','https://booth.pm/gifts/b']);assert.deepEqual(editor.exportState().map(i=>i.id),[1,2]);assert.equal(get('reference-price').value,'1100');
 await url(cards()[0]).input('https://booth.pm/gifts/changed');assert.equal(price(cards()[0]).value,'');assert.equal(get('reference-price').value,'');assert.ok(removed.includes('pack:1'));
