@@ -43,10 +43,10 @@ def prepare(data):
         item['products'] = [{'name': public_text(p.get('name', '')), 'shop': public_text(p.get('shop', '')), 'url': product_url(p.get('url', ''))} for p in products]
         thumb = row.get('thumbnail', '')
         if thumb:
-            if not isinstance(thumb, str) or len(thumb) > 40000 or not re.fullmatch(r'data:image/jpeg;base64,[A-Za-z0-9+/]+={0,2}', thumb):
+            if not isinstance(thumb, str) or len(thumb) > 300000 or not re.fullmatch(r'data:image/jpeg;base64,[A-Za-z0-9+/]+={0,2}', thumb):
                 raise ValueError('Invalid thumbnail')
             binary = base64.b64decode(thumb.split(',', 1)[1], validate=True)
-            if not binary.startswith(b'\xff\xd8\xff') or not binary.endswith(b'\xff\xd9') or len(binary) > 30000:
+            if not binary.startswith(b'\xff\xd8\xff') or not binary.endswith(b'\xff\xd9') or len(binary) > 225000:
                 raise ValueError('Invalid JPEG')
             name = key + '-' + hashlib.sha256(thumb.encode()).hexdigest()[:20] + '.jpg'
             images[name] = binary
@@ -57,8 +57,8 @@ def prepare(data):
 
 def fetch_json(url):
     with urlopen(url, timeout=90) as response:
-        raw = response.read(6000001)
-    if len(raw) > 6000000:
+        raw = response.read(24000001)
+    if len(raw) > 24000000:
         raise ValueError('Public catalog is too large')
     return json.loads(raw)
 

@@ -1,6 +1,6 @@
 import {createSubmissionLifecycle,forgetSubmission} from './submission-client.js?v=20261104-debug3';
 import {createPackEditor} from './pack-editor.js?v=20261106-gift-prefill';
-import {createThumbnailUploader} from './image-upload.js?v=20261104-debug3';
+import {createThumbnailUploader} from './image-upload.js?v=20261106-quality90';
 import {renderPrizeCard,getCardTheme,layoutAward} from './card-render.js?v=20261104-debug3';
 import {createLayers} from './layers.js?v=20261106-editor';
 import {normalizeBoothUrl,parseProduct,buildPrefillUrl,createSummary,validateGiftUrls,validateFields,CARD_TEXT_LIMITS} from './prize-core.js?v=20261106-gift-prefill';
@@ -190,7 +190,7 @@ $('validate-information').addEventListener('click',validation);
 function encodeThumbnail(){
   if(!layerEditor.hasContent())return '';
   const out=renderPrizeCard(canvas,values());
-  for(const quality of [.85,.7,.55,.4,.25]){const data=out.toDataURL('image/jpeg',quality);if(data.length<=40000)return data;}
+  const data=out.toDataURL('image/jpeg',.95);if(data.length<=300000)return data;
   throw new Error('画像データが大きいため引き継げません。画像や文字を減らして再度お試しください。');
 }
 function setFormBlocked(blocked,message='画像をアップロードしています…'){

@@ -89,7 +89,7 @@ function onPrizeSubmissionLifecycle_(e){
     }catch(error){sheet.getRange(row,statusCol).setValue('要確認');if(authorized&&draftFile&&meta&&meta.state!=='submitted'){meta.state='rejected';meta.message=String(error.message||'入力内容をご確認ください。').slice(0,200);draftFile.setDescription(JSON.stringify(meta));}return false;}
   }finally{lock.releaseLock();}
 }
-function onPrizeImageFormSubmit(e){if(onPrizeSubmissionLifecycle_(e))processPrizeImageFormSubmit_(e);}
+function onPrizeImageFormSubmit(e){if(onPrizeSubmissionLifecycle_(e)){processPrizeImageFormSubmit_(e);preparePrizeReceipts(e);}}
 function cleanupSubmissionDrafts_(){
   var files=imageFolder_().getFiles(),cutoff=Date.now()-7*86400000;
   while(files.hasNext()){var f=files.next();if(/^submission-[a-f0-9]{32}\.json$/.test(f.getName())){try{var root=submissionRead_(f);if(root.revision===0&&(root.lastDraftAt||root.created)<cutoff)f.setTrashed(true);}catch(_){}continue;}if(!/^draft-[a-f0-9]{32}\.json$/.test(f.getName()))continue;try{var m=JSON.parse(f.getDescription());if(m.kind==='bingo-submission'&&m.state!=='submitted'&&m.created<cutoff)f.setTrashed(true);}catch(_){}}

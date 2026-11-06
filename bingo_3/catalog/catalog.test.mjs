@@ -8,7 +8,7 @@ assert.equal(data.items.length,2);assert.equal(data.items[0].kind,'pack');assert
 assert.equal(data.items[1].id.length,22);for(const secret of ['secret@example.com','/gifts/','B3E-','受取コード','内部情報'])assert.ok(!JSON.stringify(data).includes(secret));
 assert.equal(filterPrizes(data.items,{category:'ギミック',platform:'Unity',kind:'pack',query:'同梱'}).length,1);assert.equal(filterPrizes(data.items,{query:'景品a'}).length,1);assert.equal(filterPrizes(data.items,{platform:'VRM'}).length,0);
 assert.equal(safeProductUrl('https://booth.pm/gifts/secret'),'');assert.equal(safeProductUrl('javascript:alert(1)'),'');assert.equal(safeProductUrl('https://evil.test/items/1'),'');assert.equal(safeProductUrl('https://shop.booth.pm/items/1?gift=x'),'');
-assert.throws(()=>c.catalogSafeText_('B3E-abcdef',100));assert.throws(()=>c.catalogBuild_({getDataRange:()=>({getValues:()=>[headers,...Array(1001).fill(valid)]})},()=>'',0));
+assert.throws(()=>c.catalogSafeText_('B3E-abcdef',100));assert.throws(()=>c.catalogSafeText_('B3-11111111-22222222-33333333-44444444',160));assert.throws(()=>c.catalogBuild_({getDataRange:()=>({getValues:()=>[headers,...Array(1001).fill(valid)]})},()=>'',0));
 console.log('Catalog sanitization, publication states, missing images, pack filtering, safe links and limits passed.');
 
 assert.equal(c.CATALOG_TTL_MS,60000);assert.equal(data.refreshSeconds,60);
@@ -26,3 +26,11 @@ const thumb='data:image/jpeg;base64,/9j/2Q==';
 c.catalogResponse_=()=>({getContent:()=>JSON.stringify({ok:true,v:1,items:[{id:'p-'+'a'.repeat(20),thumbnail:thumb}]})});
 const info=c.catalogInfoResponse_();assert.equal(info.items[0].thumbnail,undefined);assert.equal(info.items[0].thumbnailUrl,'https://watbox.net/bingo_3/catalog/media/p-'+ 'a'.repeat(20)+'-'+crypto.createHash('sha256').update(thumb).digest('hex').slice(0,20)+'.jpg');
 assert.equal(safeThumbnailUrl(info.items[0].thumbnailUrl),info.items[0].thumbnailUrl);for(const url of ['https://evil.test/a.jpg','data:image/jpeg;base64,AAAA','https://watbox.net/bingo_3/catalog/media/../secret'])assert.equal(safeThumbnailUrl(url),'');
+
+// A claimed image remains bound to the same submission after a row move.
+let imageMeta={kind:'bingo-thumbnail',state:'claimed',row:'123:13',draftId:'a'.repeat(32)},reads=0;
+c.imageFolder_=()=>({});c.imageFile_=()=>({getDescription:()=>JSON.stringify(imageMeta),getBlob:()=>({getBytes:()=>{reads++;return [255,216,255,217];}})});c.Utilities={base64Encode:()=>'/9j/2Q=='};
+const imageId='bingo-image:11111111-2222-3333-4444-555555555555';
+assert.ok(c.catalogThumbnail_(imageId,'123:2','a'.repeat(32)));assert.equal(c.catalogThumbnail_(imageId,'123:2','b'.repeat(32)),'');assert.equal(c.catalogThumbnail_(imageId,'123:2'),'');assert.equal(reads,1);
+imageMeta.state='pending';assert.equal(c.catalogThumbnail_(imageId,'123:2','a'.repeat(32)),'');assert.equal(reads,1);
+console.log('Stable submission image bindings survive row moves and reject other submissions or unclaimed images.');

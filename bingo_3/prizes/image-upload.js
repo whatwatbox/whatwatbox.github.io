@@ -5,7 +5,7 @@ export function createThumbnailUploader({endpoint,fetchImpl=fetch,timeoutMs=4500
     if(!endpoint)throw new Error('画像アップロード先が未設定です。運営側の接続設定をお待ちください。');
     const url=new URL(endpoint);
     if(url.protocol!=='https:'||url.hostname!=='script.google.com'||!/^\/macros\/s\/[\w-]+\/exec$/.test(url.pathname))throw new Error('画像アップロード先の設定をご確認ください。');
-    if(!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(data)||data.length>40000)throw new Error('画像の形式・容量をご確認ください。');
+    if(!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(data)||data.length>300000)throw new Error('画像の形式・容量をご確認ください。');
     if(data===lastData&&lastToken)return lastToken;
     if(inflight){await inflight;return upload(data);}
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);

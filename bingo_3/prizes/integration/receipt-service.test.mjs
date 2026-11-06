@@ -10,7 +10,7 @@ const c={DriveApp:{Access:{PRIVATE:'private'},getFileById:()=>({getSharingAccess
 vm.createContext(c);vm.runInContext(fs.readFileSync(root+'prizes/integration/receipt-service.gs','utf8'),c);
 c.preparePrizeReceipts();const m=sheets[1].values;assert.equal(m.length,3);assert.equal(m[1][0],'準備');assert.equal(JSON.parse(m[1][5]).length,2);c.preparePrizeReceipts();assert.equal(m.length,3);
 const post=code=>c.doPost({postData:{contents:JSON.stringify({code})}});
-assert.equal(post(m[1][3]).ok,false);m[1][0]='有効';const result=post(m[1][3]);assert.equal(result.ok,true);assert.equal(result.items.length,2);assert.equal(result.items[1].name,'商品B');assert.equal(post(m[1][3]).ok,true);assert.equal(m[1][0],'有効');
+assert.equal(post(m[1][3]).code,'PENDING');assert.equal(post(m[1][3]).items,undefined);m[1][0]='有効';const result=post(m[1][3]);assert.equal(result.ok,true);assert.equal(result.items.length,2);assert.equal(result.items[1].name,'商品B');assert.equal(post(m[1][3]).ok,true);assert.equal(m[1][0],'有効');
 assert.equal(post('wrong').ok,false);assert.equal(c.doGet().ok,false);m[1][0]='停止';assert.equal(post(m[1][3]).ok,false);m[1][0]='有効';
 const original=m[1][5];m[1][5]=JSON.stringify([{giftUrl:'https://evil.test/gifts/test'}]);assert.equal(post(m[1][3]).ok,false);m[1][5]=original;
 assert.throws(()=>c.receiptPack_('bingo-pack:v1:AAAA'));const mismatched=JSON.parse(JSON.stringify(pack));mismatched.items.pop();assert.throws(()=>c.receiptPack_('bingo-pack:v1:'+zlib.gzipSync(JSON.stringify(mismatched)).toString('base64')));
@@ -25,3 +25,7 @@ const privateDrive=c.DriveApp.getFileById;c.DriveApp.getFileById=()=>({getSharin
 for(const value of [undefined,'false','TRUE']){props.RECEIPT_ENABLED=value;const count=props.RECEIPT_REQUEST_COUNT;const paused=post(m[1][3]);assert.equal(paused.code,'DISABLED');assert.equal(paused.items,undefined);assert.equal(props.RECEIPT_REQUEST_COUNT,count);}
 props.RECEIPT_ENABLED='true';assert.equal(post(m[1][3]).ok,true);
 console.log('Global receipt pause rejects valid codes without reading gifts or consuming request quota.');
+
+rows.push(['https://booth.pm/gifts/event-only','新規','店','','','']);rows.push(['https://booth.pm/gifts/not-event','別回答','店','','','']);const before=m.length;c.preparePrizeReceipts({range:{getSheet:()=>source,getRow:()=>rows.length-1}});assert.equal(m.length,before+1);assert.equal(m.at(-1)[0],'準備');assert.equal(m.at(-1)[6],'1:'+(rows.length-1));c.preparePrizeReceipts({range:{getSheet:()=>source,getRow:()=>rows.length-1}});assert.equal(m.length,before+1);console.log('Submission-trigger generation is row-scoped, pending and idempotent.');
+
+const generated=m.at(-1);const saved=generated[5];generated[0]='準備中';generated[5]='invalid-private-data';assert.equal(post(generated[3]).code,'PENDING');assert.equal(post(generated[3]).items,undefined);generated[0]='準備';generated[5]=saved;assert.equal(post('B3-ffffffff-ffffffff-ffffffff-ffffffff').code,'NOT_FOUND');console.log('Pending replies expose no title or gift data, including the preparation-state alias.');
