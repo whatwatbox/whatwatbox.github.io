@@ -7,3 +7,5 @@
 .catalog-image-pending{display:grid;place-items:center;height:100%;min-height:150px;line-height:1.6;font-size:14px;color:var(--ink)}
 
 .catalog-thumb[hidden]{display:none}
+
+.catalog-card{border:0;background:transparent;border-radius:0;overflow:visible}.catalog-image-button,.catalog-thumb{background:transparent;border-radius:0}.catalog-viewer img{border-radius:0}
