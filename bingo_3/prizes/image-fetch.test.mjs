@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const source=fs.readFileSync(new URL('./prize-app.js',import.meta.url),'utf8');
+const flow=source.slice(source.indexOf('function serviceUrl('),source.indexOf('async function importProduct'));
+const calls=[];let reply={ok:true,json:async()=>({ok:true,dataUrl:'data:image/jpeg;base64,AAA='})};
+const context=vm.createContext({URL,Error,AbortSignal,config:{metadataEndpoint:'https://script.google.com/macros/s/test/exec'},location:{href:'https://watbox.net/bingo_3/prizes/',hostname:'watbox.net'},fetch:async(...args)=>{calls.push(args);if(reply instanceof Error)throw reply;return reply;}});
+vm.runInContext(flow,context);
+const run=()=>vm.runInContext("requestMetadata('image',{url:'https://watbox.booth.pm/items/3188374',index:'0'})",context);
+assert.equal((await run()).ok,true);
+const [url,options]=calls[0];assert.equal(new URL(url).searchParams.has('callback'),false);assert.equal(options.credentials,'omit');assert.equal(options.referrerPolicy,'no-referrer');
+reply={ok:false};await assert.rejects(run(),/画像を取得/);
+reply={ok:true,json:async()=>({ok:false,error:'画像サイズが大きすぎます'})};await assert.rejects(run(),/画像サイズ/);
+reply=Object.assign(Error('timeout'),{name:'TimeoutError'});await assert.rejects(run(),/タイムアウト/);
+reply=Error('network');await assert.rejects(run(),/接続できません/);
+context.config.metadataEndpoint='https://evil.example/exec';const count=calls.length;await assert.rejects(run(),/設定/);assert.equal(calls.length,count);
+console.log('Image JSON fetch: success, no JSONP, omitted credentials, HTTP/service/network/timeout failures, endpoint allowlist passed.');
