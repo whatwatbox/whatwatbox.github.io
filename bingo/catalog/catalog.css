@@ -11,3 +11,6 @@
 .catalog-card{border:0;background:transparent;border-radius:0;overflow:visible}.catalog-image-button,.catalog-thumb{background:transparent;border-radius:0}.catalog-viewer img{border-radius:0}
 
 .catalog-viewer-stage{position:relative}.catalog-viewer-nav{position:absolute;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:44px;height:52px;padding:0;border:1px solid #ffffff80;border-radius:8px;background:#132b40dc;color:#fff;font:38px/1 sans-serif;cursor:pointer}.catalog-viewer-previous{left:8px}.catalog-viewer-next{right:8px}.catalog-viewer-nav:disabled{opacity:.3;cursor:default}.catalog-viewer-nav:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}.catalog-viewer-position{margin:10px 0 0;text-align:center;color:#fff;font-size:14px}
+
+/* Match the 24px rounded card drawn on the 512px thumbnail canvas. */
+.catalog-thumb,.catalog-viewer img{clip-path:inset(.1953125% round 4.6875%)}
