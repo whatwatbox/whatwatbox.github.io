@@ -13,10 +13,10 @@ class Element{
 }
 const elements={},get=id=>elements[id]??=new Element();
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};};
-let upload=deferred(),prepare=deferred();
-const context=vm.createContext({URL,Error,Promise,clearTimeout,setTimeout,buildPrefillUrl,validateGiftUrls,document:{fonts:{ready:Promise.resolve()}},$:get,
+let upload=deferred(),prepare=deferred(),timeoutCallback,locked=false;
+const context=vm.createContext({URL,Error,Promise,clearTimeout:()=>{timeoutCallback=null;},setTimeout:fn=>{timeoutCallback=fn;return 1;},buildPrefillUrl,validateGiftUrls,document:{fonts:{ready:Promise.resolve()}},$:get,
  config:{formUrl:'https://docs.google.com/forms/d/e/abc/viewform',entries:{giftUrls:'entry.1702448493',internalData:'entry.1',editId:'entry.2'}},
- lifecycle:{isLocked:()=>false,prepare:()=>prepare.promise},uploadThumbnail:()=>upload.promise,
+ lifecycle:{isLocked:()=>locked,prepare:()=>prepare.promise},uploadThumbnail:()=>upload.promise,
  editorSnapshot:()=>({kind:'single',values:{},items:[]}),encodeThumbnail:()=> 'data:image/jpeg;base64,/9j/2Q==',
  status(){},syncVersion:0,syncTimer:null,latestImageData:''});
 vm.runInContext(flow,context);
@@ -37,3 +37,11 @@ assert.equal(get('google-form-frame').inert,true);assert.equal(get('form-externa
 upload=deferred();prepare=deferred();work=vm.runInContext('syncForm()',context);await tick();upload.resolve('image');await tick();prepare.resolve({internalData:'internal',editId:'test-edit'});await work;
 assert.equal(get('google-form-frame').inert,false);
 console.log('Gift form sync: upload/preparation/load gating, errors and successful retry passed.');
+
+// A timed-out URL must load successfully on retry; matching src alone is insufficient.
+upload=deferred();prepare=deferred();work=vm.runInContext('syncForm()',context);await tick();upload.resolve('image');await tick();prepare.resolve({internalData:'new-internal',editId:'test-edit'});await tick();timeoutCallback();await work;
+assert.equal(get('google-form-frame').inert,true);
+upload=deferred();prepare=deferred();work=vm.runInContext('syncForm()',context);await tick();upload.resolve('image');await tick();prepare.resolve({internalData:'new-internal',editId:'test-edit'});await tick();assert.equal(get('google-form-frame').inert,true);get('google-form-frame').events.load();await work;assert.equal(get('google-form-frame').inert,false);
+// Submission confirmation during upload must never re-enable a locked editor.
+upload=deferred();prepare=deferred();work=vm.runInContext('syncForm()',context);await tick();locked=true;upload.resolve('image');await work;assert.equal(get('google-form-frame').inert,true);assert.equal(get('open-google-form').disabled,true);assert.equal(get('auto-sync').disabled,true);
+console.log('Timeout retry and submission-confirmation race checks passed.');

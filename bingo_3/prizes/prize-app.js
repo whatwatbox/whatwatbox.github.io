@@ -200,11 +200,12 @@ function setFormBlocked(blocked,message='画像をアップロードしていま
   $('form-external').inert=blocked;$('form-external').setAttribute('aria-disabled',String(blocked));
   if(blocked&&document.activeElement===frame)$('open-google-form').focus();
 }
+const completedFormLoads=new WeakMap();
 function loadPreparedForm(frame,url){
-  if(frame.getAttribute('src')===url)return Promise.resolve();
+  if(frame.getAttribute('src')===url&&completedFormLoads.get(frame)===url)return Promise.resolve();
   return new Promise((resolve,reject)=>{
     const finish=()=>{clearTimeout(timer);frame.removeEventListener('load',loaded);};
-    const loaded=()=>{finish();resolve();};
+    const loaded=()=>{finish();completedFormLoads.set(frame,url);resolve();};
     const timer=setTimeout(()=>{finish();reject(Error('フォームの読み込みが完了しませんでした。もう一度「入力内容をフォームに反映」を押してください。'));},30000);
     frame.addEventListener('load',loaded,{once:true});frame.src=url;
   });
@@ -216,7 +217,7 @@ async function syncForm(scroll=false){
   const version=++syncVersion;
   setFormBlocked(true);$('open-google-form').disabled=true;$('auto-sync').disabled=true;
   try{
-    await document.fonts.ready;if(version!==syncVersion)return;
+    await document.fonts.ready;if(version!==syncVersion||lifecycle?.isLocked())return;
     const snapshot=editorSnapshot(),v={...snapshot.values};
     v.giftUrls=snapshot.kind==='pack'?packEditor.giftUrls():$('booth-gift-url').value.trim();
     const giftCheck=validateGiftUrls(v.giftUrls);if(giftCheck.errors.length)throw Error(giftCheck.errors[0]);if(!giftCheck.count)throw Error('BOOTHのギフトURLをご入力ください。');
@@ -229,21 +230,21 @@ async function syncForm(scroll=false){
     if(!config.entries.internalData||!config.entries.editId)throw new Error('内部情報のフォーム項目が未設定です。');
     status('image-data-status','画像をアップロードしています…');
     const imageId=await uploadThumbnail(latestImageData);
-    if(version!==syncVersion)return;
-    const prepared=await lifecycle.prepare(imageId,v.packData||'',{snapshot,isCurrent:()=>version===syncVersion});
-    if(version!==syncVersion)return;
+    if(version!==syncVersion||lifecycle?.isLocked())return;
+    const prepared=await lifecycle.prepare(imageId,v.packData||'',{snapshot,isCurrent:()=>version===syncVersion&&!lifecycle?.isLocked()});
+    if(version!==syncVersion||lifecycle?.isLocked())return;
     url.searchParams.set(config.entries.internalData,prepared.internalData);url.searchParams.set(config.entries.editId,prepared.editId);
     // Gift URLs go only to the configured Google Form, alongside opaque image references.
     if(url.href.length>7500)throw Error('入力内容が長すぎます。景品名などを短くしてください。');
     const frame=$('google-form-frame');setFormBlocked(true,'画像を保存しました。フォームへ入力内容を反映しています…');
-    await loadPreparedForm(frame,url.href);if(version!==syncVersion)return;
+    await loadPreparedForm(frame,url.href);if(version!==syncVersion||lifecycle?.isLocked())return;
     $('form-external').href=url.href;
     status('image-data-status','画像と復元用データを保存しました。投稿はフォームでの送信後に完了します。');
     status('form-status','入力内容・ギフトURL・画像IDを反映しました。下のフォームで確認して送信してください。');
     setFormBlocked(false);
     if(scroll)frame.scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(error){if(version!==syncVersion)return;status('image-data-status','画像の反映が完了していません。',true);status('form-status',error.message,true);setFormBlocked(true,'反映できませんでした。入力内容を確認し、もう一度「入力内容をフォームに反映」を押してください。');}
-  finally{if(version===syncVersion){$('open-google-form').disabled=false;$('auto-sync').disabled=false;}}
+  }catch(error){if(version!==syncVersion||lifecycle?.isLocked())return;status('image-data-status','画像の反映が完了していません。',true);status('form-status',error.message,true);setFormBlocked(true,'反映できませんでした。入力内容を確認し、もう一度「入力内容をフォームに反映」を押してください。');}
+  finally{if(version===syncVersion){$('open-google-form').disabled=!!lifecycle?.isLocked();$('auto-sync').disabled=!!lifecycle?.isLocked();}}
 }
 $('open-google-form').addEventListener('click',()=>{const {errors}=validation();if(!errors.length)syncForm(true);});
 $('auto-sync').addEventListener('change',()=>{if($('auto-sync').checked)syncForm(false);else{clearTimeout(syncTimer);++syncVersion;status('form-status','自動反映を停止しました。フォームの内容を確認して送信してください。');status('image-data-status','');}});
