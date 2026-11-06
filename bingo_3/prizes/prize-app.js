@@ -9,7 +9,7 @@ const $ = id => document.getElementById(id);
 const fields = {productUrl:'booth-url',productName:'product-name',shopName:'shop-name',providerName:'provider-name',contact:'provider-contact',awardName:'award-name',price:'reference-price',clusterId:'cluster-id',category:'product-category',platform:'product-platform'};
 let config = {}, product = null, sourceVersion = 0, requestVersion = 0;
 const remoteImages=new Map();
-let imageSaved = false, callbackSequence = 0;
+let imageSaved = false;
 const canvas = $('thumbnail-canvas'), ctx = canvas.getContext('2d');
 const layerEditor=createLayers(canvas,draw);
 let packEditor,lifecycle,restoredDescription='';
@@ -65,20 +65,21 @@ function serviceUrl(action,args) {
   for(const [key,value]of Object.entries(args))url.searchParams.set(key,value);
   return url;
 }
-function jsonp(action,args) {
-  return new Promise((resolve,reject)=>{
-    let url;
-    try{url=serviceUrl(action,args);}catch(error){reject(error);return;}
-    const name=`bingoProduct_${Date.now()}_${callbackSequence++}`;
-    url.searchParams.set('callback',name);
-    const script=document.createElement('script');
-    let timer;
-    const cleanup=()=>{clearTimeout(timer);script.remove();delete window[name];};
-    window[name]=result=>{cleanup();result?.ok?resolve(result):reject(new Error(result?.error||'商品情報を取得できませんでした。'));};
-    script.onerror=()=>{cleanup();reject(new Error('商品情報を取得できませんでした。手動入力をご利用ください。'));};
-    timer=setTimeout(()=>{cleanup();reject(new Error('取得がタイムアウトしました。時間をおいて再度お試しください。'));},20000);
-    script.src=url.href;script.referrerPolicy='no-referrer';document.head.append(script);
-  });
+async function requestMetadata(action,args) {
+  // Read JSON rather than executing a cross-site JSONP script. Some browsers
+  // block the script response even though the same API permits CORS fetches.
+  const url=serviceUrl(action,args);
+  let response;
+  try {
+    response=await fetch(url.href,{credentials:'omit',referrerPolicy:'no-referrer',signal:AbortSignal.timeout(45000)});
+  } catch(error) {
+    if(error.name==='TimeoutError')throw new Error('画像の取得がタイムアウトしました。もう一度選択してください。');
+    throw new Error('画像取得サービスに接続できませんでした。もう一度選択するか、画像ファイルをご利用ください。');
+  }
+  if(!response.ok)throw new Error('画像を取得できませんでした。もう一度選択してください。');
+  const result=await response.json();
+  if(!result?.ok)throw new Error(result?.error||'画像を取得できませんでした。');
+  return result;
 }
 async function importProduct(data,url) {
   const nextProduct=parseProduct(data,url);
@@ -137,7 +138,7 @@ function getRemoteImage(current,index){
   const promise=(async()=>{
     // BOOTH image CDN lacks canvas CORS permission. Avoid a failed direct load
     // on every click; fetch the editable image once through the approved service.
-    const result=await jsonp('image',{url:current.url,index:String(index)});
+    const result=await requestMetadata('image',{url:current.url,index:String(index)});
     if(!/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(result.dataUrl||''))throw Error();
     return loadImage(result.dataUrl);
   })();
@@ -158,9 +159,9 @@ async function loadRemoteImage(index) {
     setImage(image,`商品画像 ${index+1}`,`${current.url}#${index}`);status('image-status','商品画像をレイヤーに追加しました。');
     // Warm just one neighbour, rather than downloading the whole gallery.
     if(current.images[index+1])getRemoteImage(current,index+1).catch(()=>{});
-  }catch{if(version===sourceVersion){
+  }catch(error){if(version===sourceVersion){
     $('product-images').querySelectorAll('button').forEach(button=>button.setAttribute('aria-pressed','false'));
-    status('image-status','画像を読み込めませんでした。もう一度選択するか、お手元の画像をご利用ください。',true);
+    status('image-status',error.message||'画像を読み込めませんでした。もう一度選択するか、お手元の画像をご利用ください。',true);
   }}finally{if(version===sourceVersion){$('image-loading').hidden=true;canvas.removeAttribute('aria-busy');}}
 }
 function draw(){
