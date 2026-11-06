@@ -2,7 +2,7 @@
 
 ## 現在の構成
 
-- サイト：GitHub Pages用の静的HTML・JavaScript。ローカル確認は http://127.0.0.1:8766/bingo/prizes/ 。Gitコミット・pushは未実施。
+- サイト：GitHub Pages用の静的HTML・JavaScript。ローカル確認は http://127.0.0.1:8766/bingo_3/prizes/ 。Gitコミット・pushは未実施。
 - [フォーム編集](https://docs.google.com/forms/d/12UKXONQvGp46JR1j81td8oxRt08RP1tDwmcyW66T5N4/edit) ／ [回答シート](https://docs.google.com/spreadsheets/d/1Qmw7PlhCAOjF3HUtstM88YQkU5TLw8LlIuFWPWeQCmU/edit)
 - BOOTH取得：`integration/booth-service.gs`。独立GAS、URLFetchのみ。ギフト画面から商品URLを見つけて商品情報・画像を取得する。受取操作はしない。ギフトURLをログ・キャッシュへ保存しない。
 - 画像・投稿・受取：`integration/image-upload-service.gs` を [承認済みGAS](https://script.google.com/home/projects/1JQdC967JCqk-daa8E1VdUTv_oOmXpBEVfxyEQk_B8pVe7qZS1xR3f9Da/edit) に配置。所有者実行・全員から呼出可能。公開バージョン8。追加のOAuthスコープなし。
@@ -59,7 +59,7 @@ Googleフォームは確認済みメールアドレスを収集し、回答コ�
 
 ## 検証
 
-`node --test bingo/prizes/prize-core.test.mjs bingo/prizes/integration/receipt-service.test.mjs bingo/prizes/integration/submission-service.test.mjs`
+`node --test bingo_3/prizes/prize-core.test.mjs bingo_3/prizes/integration/receipt-service.test.mjs bingo_3/prizes/integration/submission-service.test.mjs`
 
 下書き・送信確定・復元・0円・修正差替・再実行・重複・古い世代・別メール・他投稿のID混在・状況トークン改ざん・公開済み景品ロックをモックで検証。実Googleフォームへ架空ギフトのテスト回答を送り、回答受信・画像保存・完了表示・修正IDでの復元を確認した。有料ギフトの受取操作は行っていない。
 
@@ -78,7 +78,7 @@ clusterユーザーIDはサイト・Googleフォームとも任意。イベン�
 
 画像受付GASを既存URLのままバージョン9へ更新しました。`GET ?action=publicCatalog` は公開項目だけを返します。回答シート・画像フォルダの共有権限は変更していません。
 
-一覧ページは `/bingo/catalog/`。アクセス時とタブ復帰時、表示中は1分ごとに取得します。サーバーは1分未満の公開専用スナップショットを再利用し、期限後の最初のアクセスで更新します。定期トリガーは追加していません。
+一覧ページは `/bingo_3/catalog/`。アクセス時とタブ復帰時、表示中は1分ごとに取得します。サーバーは1分未満の公開専用スナップショットを再利用し、期限後の最初のアクセスで更新します。定期トリガーは追加していません。
 
 回答シートの「投稿状態」が「有効」の行だけ掲載します。「一覧公開」を「非公開」にすると次回更新で除外されます。受取コードの有効化とは独立です。緊急反映は `refreshPrizeCatalog` を実行してください。詳細は `../catalog/README.md`。
 

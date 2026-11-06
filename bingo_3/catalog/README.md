@@ -1,6 +1,6 @@
 # 景品一覧
 
-URL: /bingo/catalog/
+URL: /bingo_3/catalog/
 
 画像受付GASの doGet?action=publicCatalog から、公開専用データだけを取得します。直近1分のスナップショットを再利用し、期限後の最初のアクセスでシートから再生成します。ページ読み込み時・タブ復帰時・手動更新時に取得し、閲覧中も1分ごとに更新確認します。アクセスがない間は処理を実行しません。
 
@@ -12,13 +12,13 @@ URL: /bingo/catalog/
 
 同梱 catalog-service.gs は画像受付GASへの組み込み元です。スタンドアロン公開はしません。
 
-検証: node --test bingo/catalog/catalog.test.mjs
+検証: node --test bingo_3/catalog/catalog.test.mjs
 
 ## 接続状態
 画像受付GAS バージョン9（2026-11-05）へ更新デプロイ済み。configurePrizeCatalog により回答シートへ「一覧公開」列を追加済みです。GET action=publicCatalog の正常応答を確認し、catalog-config.json の enabled=true で接続しています。公開対象0件の場合も正常な空の一覧を表示します。
 
 ## 公開画像の静的配信（2026-11-06）
-閲覧ページは publicCatalogInfo で画像URLだけを取得します。画像本体は https://watbox.net/bingo/catalog/media/ のJPEGです。初期表示は同じ公開先の public-catalog.json を先に読み、最新の景品情報をGASで確認します。
+閲覧ページは publicCatalogInfo で画像URLだけを取得します。画像本体は https://watbox.net/bingo_3/catalog/media/ のJPEGです。初期表示は同じ公開先の public-catalog.json を先に読み、最新の景品情報をGASで確認します。
 
 GitHub ActionsのPagesワークフローが5分ごと（実行遅延あり）に従来の公開API publicCatalog から公開専用データを取得し、公開項目を再検証して静的画像と一覧スナップショットを生成します。非公開Driveへの認証情報やGitHubトークンをGASに渡しません。元フォルダの共有設定は変更しません。画像URLは公開用IDと画像内容のハッシュのみで構成し、ギフトURL・修正ID・メールは出力しません。
 

@@ -4,4 +4,4 @@ export function filterPrizes(items,{query='',category='',platform='',kind=''}={}
 }
 export function safeProductUrl(raw){try{const u=new URL(raw);return u.protocol==='https:'&&!u.username&&!u.password&&!u.port&&/^(?:[a-z0-9-]+\.)?booth\.pm$/.test(u.hostname)&&/^\/(?:[a-z]{2}\/)?items\/\d{1,12}$/.test(u.pathname)&&!u.search&&!u.hash?u.href:'';}catch{return '';}}
 
-export function safeThumbnailUrl(raw){try{const u=new URL(raw);return u.origin==='https://watbox.net'&&!u.username&&!u.password&&!u.search&&!u.hash&&/^\/bingo\/catalog\/media\/p-[a-f0-9]{20}-[a-f0-9]{20}\.jpg$/.test(u.pathname)?u.href:'';}catch{return '';}}
+export function safeThumbnailUrl(raw){try{const u=new URL(raw);return u.origin==='https://watbox.net'&&!u.username&&!u.password&&!u.search&&!u.hash&&/^\/bingo_3\/catalog\/media\/p-[a-f0-9]{20}-[a-f0-9]{20}\.jpg$/.test(u.pathname)?u.href:'';}catch{return '';}}

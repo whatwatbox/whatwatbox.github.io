@@ -15,7 +15,7 @@ from urllib.request import Request, urlopen
 from publish_prize_catalog import publish
 
 
-PUBLIC_DIRS = {"assets", "css", "js", "editor", "bingo"}
+PUBLIC_DIRS = {"assets", "css", "js", "editor", "bingo_3"}
 
 
 def git(*args):

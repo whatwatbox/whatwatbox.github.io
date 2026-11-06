@@ -9,7 +9,7 @@ import re
 from urllib.request import urlopen
 
 ENDPOINT = 'https://script.google.com/macros/s/AKfycbx1iHBZOeodXb0zEd5VoSf4euAhLQD-xFithtg-xFUfErfgsT65EZx7-w3a7dt49NF_/exec?action=publicCatalog'
-PUBLIC_ROOT = 'https://watbox.net/bingo/catalog/'
+PUBLIC_ROOT = 'https://watbox.net/bingo_3/catalog/'
 SECRET = re.compile(r'booth\.pm/gifts/|B3[ES]-[a-f0-9-]+|bingo-image:|[^\s@]+@[^\s@]+\.[^\s@]+', re.I)
 
 def public_text(value, limit=160):
@@ -68,7 +68,7 @@ def publish(output):
         previous = fetch_json(PUBLIC_ROOT + 'public-catalog.json')
     except Exception:
         previous = {}
-    root = Path(output) / 'bingo' / 'catalog'
+    root = Path(output) / 'bingo_3' / 'catalog'
     root.mkdir(parents=True, exist_ok=True)
     media = root / 'media'
     media.mkdir(exist_ok=True)

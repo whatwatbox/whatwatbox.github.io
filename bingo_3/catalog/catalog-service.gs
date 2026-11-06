@@ -46,6 +46,6 @@ function refreshPrizeCatalog(){var f=catalogFile_();if(f){var lock=LockService.g
 function catalogInfoResponse_(){
  var response=catalogResponse_(),data=JSON.parse(response.getContent());
  if(!data.ok)return imageJson_(data);
- data.items.forEach(function(p){var thumbnail=p.thumbnail||'';delete p.thumbnail;p.thumbnailUrl=/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(thumbnail)?'https://watbox.net/bingo/catalog/media/'+p.id+'-'+imageHash_(thumbnail).slice(0,20)+'.jpg':'';});
+ data.items.forEach(function(p){var thumbnail=p.thumbnail||'';delete p.thumbnail;p.thumbnailUrl=/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(thumbnail)?'https://watbox.net/bingo_3/catalog/media/'+p.id+'-'+imageHash_(thumbnail).slice(0,20)+'.jpg':'';});
  return imageJson_(data);
 }

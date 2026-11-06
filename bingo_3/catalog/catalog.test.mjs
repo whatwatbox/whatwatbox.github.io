@@ -24,5 +24,5 @@ privateSheet=false;assert.equal(c.catalogResponse_().code,'UNAVAILABLE');assert.
 
 const thumb='data:image/jpeg;base64,/9j/2Q==';
 c.catalogResponse_=()=>({getContent:()=>JSON.stringify({ok:true,v:1,items:[{id:'p-'+'a'.repeat(20),thumbnail:thumb}]})});
-const info=c.catalogInfoResponse_();assert.equal(info.items[0].thumbnail,undefined);assert.equal(info.items[0].thumbnailUrl,'https://watbox.net/bingo/catalog/media/p-'+ 'a'.repeat(20)+'-'+crypto.createHash('sha256').update(thumb).digest('hex').slice(0,20)+'.jpg');
-assert.equal(safeThumbnailUrl(info.items[0].thumbnailUrl),info.items[0].thumbnailUrl);for(const url of ['https://evil.test/a.jpg','data:image/jpeg;base64,AAAA','https://watbox.net/bingo/catalog/media/../secret'])assert.equal(safeThumbnailUrl(url),'');
+const info=c.catalogInfoResponse_();assert.equal(info.items[0].thumbnail,undefined);assert.equal(info.items[0].thumbnailUrl,'https://watbox.net/bingo_3/catalog/media/p-'+ 'a'.repeat(20)+'-'+crypto.createHash('sha256').update(thumb).digest('hex').slice(0,20)+'.jpg');
+assert.equal(safeThumbnailUrl(info.items[0].thumbnailUrl),info.items[0].thumbnailUrl);for(const url of ['https://evil.test/a.jpg','data:image/jpeg;base64,AAAA','https://watbox.net/bingo_3/catalog/media/../secret'])assert.equal(safeThumbnailUrl(url),'');
