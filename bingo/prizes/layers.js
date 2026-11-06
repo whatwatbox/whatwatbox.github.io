@@ -22,8 +22,19 @@ export function createLayers(canvas,redraw){
   function renderList(){
     $('layer-list').replaceChildren();
     [...layers].reverse().forEach(l=>{
-      const b=document.createElement('button');b.type='button';b.className='layer-row';b.textContent=`${l.visible?'●':'○'} ${l.type==='text'?l.text.slice(0,18)||'文字':l.name}`;
-      b.setAttribute('aria-pressed',String(l.id===selected));b.onclick=()=>select(l.id);$('layer-list').append(b);
+      const name=l.type==='text'?l.text.slice(0,18)||'文字':l.name;
+      const row=document.createElement('div');row.className='layer-row';row.dataset.selected=String(l.id===selected);
+      const visibility=document.createElement('button');visibility.type='button';visibility.className='layer-visibility';visibility.setAttribute('aria-label',name+'の表示');
+      function updateEye(){
+        const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.8');
+        const eye=document.createElementNS(ns,'path');eye.setAttribute('d','M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z');
+        const pupil=document.createElementNS(ns,'circle');pupil.setAttribute('cx','12');pupil.setAttribute('cy','12');pupil.setAttribute('r','3');svg.append(eye,pupil);
+        if(!l.visible){const slash=document.createElementNS(ns,'path');slash.setAttribute('d','M3 3 21 21');svg.append(slash);}
+        visibility.replaceChildren(svg);visibility.setAttribute('aria-pressed',String(l.visible));visibility.title=l.visible?'非表示にする':'表示する';
+      }
+      updateEye();visibility.onclick=()=>{l.visible=!l.visible;updateEye();props();redraw();};
+      const b=document.createElement('button');b.type='button';b.className='layer-select';b.textContent=name;
+      b.setAttribute('aria-pressed',String(l.id===selected));b.onclick=()=>select(l.id);row.append(visibility,b);$('layer-list').append(row);
     });
     if(!layers.length){const p=document.createElement('p');p.textContent='画像や文字を追加してください。';$('layer-list').append(p);}
   }
@@ -33,7 +44,7 @@ export function createLayers(canvas,redraw){
     $('layer-color-field').hidden=l.type!=='text';$('layer-font-field').hidden=l.type!=='text';$('layer-stroke-field').hidden=l.type!=='text';$('layer-font').value=layerFont(l);$('layer-stroke').value=l.stroke||'#202020';
     $('layer-size').min=l.type==='text'?'8':'5';$('layer-size').max=l.type==='text'?'180':'500';
     for(const k of ['x','y','size','opacity','rotation'])$(`layer-${k}`).value=l[k];
-    $('layer-color').value=l.color||'#ffffff';$('layer-visible').checked=l.visible;
+    $('layer-color').value=l.color||'#ffffff';
     $('layer-active-name').textContent=l.type==='text'?'文字':l.name;
     $('fit-layer').disabled=l.type!=='image';$('fill-layer').disabled=l.type!=='image';
   }
@@ -71,8 +82,8 @@ export function createLayers(canvas,redraw){
     catch{$('layer-status').textContent='画像を読み込めませんでした。4000万画素以下の画像をご利用ください。';}
     finally{URL.revokeObjectURL(url);e.target.value='';}
   };
-  for(const k of ['x','y','size','opacity','rotation','text','color','stroke','font','visible'])$(`layer-${k}`).addEventListener('input',()=>{
-    const l=current();if(!l)return;l[k]=k==='visible'?$(`layer-${k}`).checked:['text','color','stroke','font'].includes(k)?$(`layer-${k}`).value:Number($(`layer-${k}`).value);
+  for(const k of ['x','y','size','opacity','rotation','text','color','stroke','font'])$(`layer-${k}`).addEventListener('input',()=>{
+    const l=current();if(!l)return;l[k]=['text','color','stroke','font'].includes(k)?$(`layer-${k}`).value:Number($(`layer-${k}`).value);
     renderList();redraw();if(k==='font')document.fonts.load(`${layerWeight(l)} 36px "${layerFont(l)}"`).then(()=>{if(layers.includes(l))redraw();}).catch(()=>{});
   });
   function remove(){const i=layers.findIndex(l=>l.id===selected);if(i<0)return;layers.splice(i,1);selected=layers[Math.min(i,layers.length-1)]?.id||null;renderList();changed();}

@@ -2,7 +2,7 @@ import {createSubmissionLifecycle,forgetSubmission} from './submission-client.js
 import {createPackEditor} from './pack-editor.js?v=20261104-debug3';
 import {createThumbnailUploader} from './image-upload.js?v=20261104-debug3';
 import {renderPrizeCard,getCardTheme,layoutAward} from './card-render.js?v=20261104-debug3';
-import {createLayers} from './layers.js?v=20261104-debug3';
+import {createLayers} from './layers.js?v=20261106-editor';
 import {normalizeBoothUrl,parseProduct,buildPrefillUrl,createSummary,validateGiftUrls,validateFields,CARD_TEXT_LIMITS} from './prize-core.js?v=20261104-debug3';
 
 const $ = id => document.getElementById(id);
@@ -14,10 +14,11 @@ const canvas = $('thumbnail-canvas'), ctx = canvas.getContext('2d');
 const layerEditor=createLayers(canvas,draw);
 let packEditor,lifecycle,restoredDescription='';
 let syncTimer, latestImageData='',uploadThumbnail,syncVersion=0;
-const values = () => ({...Object.fromEntries(Object.entries(fields).map(([name,id])=>[name,$(id).value.trim()])),guestRequest:$('guest-request').checked?'希望します':'',description:restoredDescription});
+const values = () => ({...Object.fromEntries(Object.entries(fields).map(([name,id])=>[name,$(id).value.trim()])),guestRequest:$('cluster-id').value.trim()&&$('guest-request').checked?'希望します':'',description:restoredDescription});
 function status(id,text,error=false) { const element=$(id); element.textContent=text; element.classList.toggle('is-error',error); }
 function editorSnapshot(){return {v:1,values:values(),kind:packEditor.enabled()?'pack':'single',items:packEditor.exportState(),layers:layerEditor.exportState()};}
 function update() {
+  const guest=$('guest-request');guest.disabled=!$('cluster-id').value.trim();if(guest.disabled)guest.checked=false;
   const v=values();
   applyCardTheme();
   for (const [id,key] of [['review-name','productName'],['review-shop','shopName'],['review-provider','providerName']]) $(id).textContent=v[key] || '未入力';
