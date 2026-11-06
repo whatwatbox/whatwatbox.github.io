@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const {normalizeReceiptCode,validateReceipt}=await import('data:text/javascript;base64,'+Buffer.from(readFileSync(new URL('./receipt-core.js',import.meta.url))).toString('base64'));
+const code='0123456789abcdef0123456789abcdef';
+assert.equal(normalizeReceiptCode(' B3 - 01234567 - 89ABCDEF - 01234567 - 89ABCDEF\n'),code);
+assert.equal(normalizeReceiptCode('B3-'+code),code);assert.equal(normalizeReceiptCode(code),code);
+assert.equal(normalizeReceiptCode('b3'+'0'.repeat(30)),'b3'+'0'.repeat(30));
+assert.throws(()=>validateReceipt({ok:true,title:'bad',items:[{giftUrl:'javascript:alert(1)'}]}));
+assert.throws(()=>validateReceipt({ok:true,title:'bad',items:[{giftUrl:'https://booth.pm/gifts/a',productUrl:'https://evil.test'}]}));
+assert.equal(validateReceipt({ok:true,title:'pack',items:[{name:'A',giftUrl:'https://booth.pm/gifts/a'},{name:'B',giftUrl:'https://booth.pm/gifts/b'}]}).items.length,2);
+console.log('Receipt client: case/space/prefix normalization, prefix-free b3 code, unsafe URLs and two-item rendering data passed.');

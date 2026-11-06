@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const src=readFileSync(new URL('./submission-client.js',import.meta.url),'utf8');
+const elements=new Map(),element=id=>{if(!elements.has(id))elements.set(id,{textContent:'',addEventListener(){}});return elements.get(id);};
+globalThis.document={getElementById:element,hidden:true,addEventListener(){},querySelectorAll:()=>[]};
+globalThis.window={addEventListener(){}};
+const storage=new Map();globalThis.sessionStorage={getItem:key=>storage.get(key)||null,setItem:(key,v)=>storage.set(key,v),removeItem:key=>storage.delete(key)};
+let resolveDraft,requests=[],snapshotReads=0;
+globalThis.fetch=async(url,options)=>{const body=JSON.parse(options.body);requests.push(body);const result=body.action==='saveSubmissionDraft'?await new Promise(resolve=>resolveDraft=resolve):{ok:true,state:'pending'};return {ok:true,json:async()=>result};};
+const {createSubmissionLifecycle}=await import('data:text/javascript;base64,'+Buffer.from(src).toString('base64'));
+const lifecycle=createSubmissionLifecycle({endpoint:()=> 'https://script.google.com/macros/s/test/exec',getSnapshot:()=>{snapshotReads++;return {wrong:'newer editing state'}},onLock(){},restoreSnapshot(){},onRestored(){}});
+const snapshot={v:1,values:{awardName:'captured'},layers:[],items:[],kind:'single'};
+const response={ok:true,draftId:'draft',editId:'edit',revision:0,statusToken:'status'};
+const cancelled=lifecycle.prepare('image','',{snapshot,isCurrent:()=>false});
+assert.deepEqual(requests[0].snapshot,snapshot);resolveDraft(response);await assert.rejects(cancelled,/中止/);assert.equal(storage.size,0);
+const active=lifecycle.prepare('image','',{snapshot,isCurrent:()=>true});assert.equal(requests[1].editId,'');resolveDraft(response);await active;
+assert.equal(snapshotReads,0);assert.ok([...storage.values()][0].includes('status'));assert.ok(![...storage.values()][0].includes('captured'));
+console.log('Submission client: captured snapshot, cancelled in-flight response, no cancelled status overwrite and secret-free status storage passed.');
