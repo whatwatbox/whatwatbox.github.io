@@ -21,7 +21,7 @@ $('receipt-form').addEventListener('submit',async event=>{
     const url=new URL(config.endpoint);if(url.protocol!=='https:'||url.hostname!=='script.google.com'||!/^\/macros\/s\/[\w-]+\/exec$/.test(url.pathname))throw Error('接続先の設定をご確認ください。');
     const response=await fetch(url.href,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({code}),credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store',signal:AbortSignal.timeout(30000)});
     if(!response.ok)throw Error('接続できませんでした。時間をおいて再度お試しください。');
-    const raw=await response.json();if(raw.code==='DISABLED'){config.enabled=false;$('receipt-code').disabled=true;throw Error('現在、景品の受け取りは停止しています。');}if(raw.code==='LIMIT'||raw.code==='BUSY')throw Error('現在混み合っています。時間をおいて再度お試しください。');
+    const raw=await response.json();if(raw.code==='PENDING')throw Error('この景品は受け取りの準備中です。受取コードを添えて、下の連絡先からW@へお問い合わせください。');if(raw.code==='DISABLED'){config.enabled=false;$('receipt-code').disabled=true;throw Error('現在、景品の受け取りは停止しています。');}if(raw.code==='LIMIT'||raw.code==='BUSY')throw Error('現在混み合っています。時間をおいて再度お試しください。');
     show(validateReceipt(raw));status('景品を表示しました。');
   }catch(error){status(error.name==='TimeoutError'?'確認に時間がかかっています。再度お試しください。':error.message,true);}finally{busy=false;$('receipt-submit').disabled=config.enabled!==true;}
 });
