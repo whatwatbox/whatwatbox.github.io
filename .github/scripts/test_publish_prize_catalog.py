@@ -15,6 +15,13 @@ class CatalogPublishingTests(unittest.TestCase):
         self.assertNotIn('email',item);self.assertNotIn('giftUrl',item);self.assertNotIn('thumbnail',item)
         expected=row['id']+'-'+hashlib.sha256(row['thumbnail'].encode()).hexdigest()[:20]+'.jpg'
         self.assertEqual(list(images),[expected]);self.assertTrue(item['thumbnailUrl'].endswith(expected))
+    def test_high_quality_jpeg_above_old_limit(self):
+        row=self.row()
+        row['thumbnail']='data:image/jpeg;base64,'+base64.b64encode(bytes.fromhex('ffd8ff')+bytes(60000)+bytes.fromhex('ffd9')).decode()
+        _,images=prepare(self.data(row))
+        self.assertGreater(len(next(iter(images.values()))),30000)
+        row['thumbnail']='data:image/jpeg;base64,'+base64.b64encode(bytes.fromhex('ffd8ff')+bytes(225000)+bytes.fromhex('ffd9')).decode()
+        with self.assertRaises(ValueError):prepare(self.data(row))
     def test_invalid_and_secret_data_are_rejected(self):
         for field,value in [('id','../secret'),('name','https://booth.pm/gifts/secret'),('thumbnail','data:image/jpeg;base64,AAAA'),('productUrl','https://evil.test/')]:
             row=self.row();row[field]=value
