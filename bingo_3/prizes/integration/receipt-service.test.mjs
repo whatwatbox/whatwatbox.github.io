@@ -27,3 +27,5 @@ props.RECEIPT_ENABLED='true';assert.equal(post(m[1][3]).ok,true);
 console.log('Global receipt pause rejects valid codes without reading gifts or consuming request quota.');
 
 rows.push(['https://booth.pm/gifts/event-only','新規','店','','','']);rows.push(['https://booth.pm/gifts/not-event','別回答','店','','','']);const before=m.length;c.preparePrizeReceipts({range:{getSheet:()=>source,getRow:()=>rows.length-1}});assert.equal(m.length,before+1);assert.equal(m.at(-1)[0],'準備');assert.equal(m.at(-1)[6],'1:'+(rows.length-1));c.preparePrizeReceipts({range:{getSheet:()=>source,getRow:()=>rows.length-1}});assert.equal(m.length,before+1);console.log('Submission-trigger generation is row-scoped, pending and idempotent.');
+
+const generated=m.at(-1);const saved=generated[5];generated[0]='準備中';generated[5]='invalid-private-data';assert.equal(post(generated[3]).code,'PENDING');assert.equal(post(generated[3]).items,undefined);generated[0]='準備';generated[5]=saved;assert.equal(post('B3-ffffffff-ffffffff-ffffffff-ffffffff').code,'NOT_FOUND');console.log('Pending replies expose no title or gift data, including the preparation-state alias.');
