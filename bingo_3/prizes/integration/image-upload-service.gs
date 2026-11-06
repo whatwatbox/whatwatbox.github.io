@@ -59,7 +59,7 @@ function processPrizeImageFormSubmit_(e){
       var file=imageFile_(imageFolder_(),m[1]);if(!file)throw Error('Missing file');
       var meta=JSON.parse(file.getDescription()),rowKey=sheet.getSheetId()+':'+row;
       if(meta.kind!=='bingo-thumbnail'||(meta.state==='claimed'&&meta.row!==rowKey))throw Error('Already claimed');
-      meta.state='claimed';meta.row=rowKey;file.setDescription(JSON.stringify(meta));
+      meta.state='claimed';meta.row=rowKey;if(/^[a-f0-9]{32}$/.test(internal.draftId||''))meta.draftId=internal.draftId;file.setDescription(JSON.stringify(meta));
       sheet.getRange(row,output).setValue(file.getUrl());sheet.getRange(row,state).setValue('保存済み');
     }catch(_){sheet.getRange(row,state).setValue('画像IDを確認してください（未保存・期限切れ・重複）');}
   }finally{lock.releaseLock();}
@@ -307,14 +307,14 @@ function catalogBuild_(sheet,loadImage,now){
    var productUrl=read('商品URL(任意)')?receiptProduct_(String(read('商品URL(任意)')).trim()):'';
    var products=pack?pack.map(function(p){return {name:catalogSafeText_(p.name,160),shop:catalogSafeText_(p.shop,120),url:p.url};}):[];
    var key=sheet.getSheetId()+':'+(index+2),imageId=String(internal.imageId||read('サムネ画像ID')||''),thumb='';
-   try{thumb=loadImage(imageId,key);}catch(_){} // Missing images do not hide otherwise valid prizes.
+   try{thumb=loadImage(imageId,key,internal.draftId);}catch(_){} // Missing images do not hide otherwise valid prizes.
    if(!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(thumb)||thumb.length>40000)thumb='';
    items.push({id:'p-'+imageHash_(key).slice(0,20),name:title,award:catalogSafeText_(read('賞の名前'),60),shop:catalogSafeText_(read('景品元名'),120),provider:catalogSafeText_(read('応募者名'),100),category:categories.indexOf(read('タグ1'))>=0?read('タグ1'):'その他',platform:platforms.indexOf(read('タグ2'))>=0?read('タグ2'):'その他',kind:pack?'pack':'single',productUrl:productUrl,products:products,thumbnail:thumb});
   }catch(_){} // Fail closed: malformed/private public fields are never exported.
  });
  return {ok:true,v:1,updatedAt:new Date(now).toISOString(),refreshSeconds:60,items:items.reverse()};
 }
-function catalogThumbnail_(id,key){var m=id.match(/^bingo-image:([a-f0-9-]{36})$/);if(!m)return '';var f=imageFile_(imageFolder_(),m[1]);if(!f)return '';var meta=JSON.parse(f.getDescription());if(meta.kind!=='bingo-thumbnail'||meta.state!=='claimed'||meta.row!==key)return '';var bytes=f.getBlob().getBytes();if(bytes.length>30000)return '';return 'data:image/jpeg;base64,'+Utilities.base64Encode(bytes);}
+function catalogThumbnail_(id,key,draftId){var m=id.match(/^bingo-image:([a-f0-9-]{36})$/);if(!m)return '';var f=imageFile_(imageFolder_(),m[1]);if(!f)return '';var meta=JSON.parse(f.getDescription());if(meta.kind!=='bingo-thumbnail'||meta.state!=='claimed'||(meta.row!==key&&(!/^[a-f0-9]{32}$/.test(draftId||'')||meta.draftId!==draftId)))return '';var bytes=f.getBlob().getBytes();if(bytes.length>30000)return '';return 'data:image/jpeg;base64,'+Utilities.base64Encode(bytes);}
 function catalogFile_(){var files=imageFolder_().getFilesByName('public-catalog-v1.json');return files.hasNext()?files.next():null;}
 function catalogResponse_(){
  var lock=LockService.getScriptLock();
@@ -337,4 +337,20 @@ function catalogInfoResponse_(){
  if(!data.ok)return imageJson_(data);
  data.items.forEach(function(p){var thumbnail=p.thumbnail||'';delete p.thumbnail;p.thumbnailUrl=/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(thumbnail)?'https://watbox.net/bingo_3/catalog/media/'+p.id+'-'+imageHash_(thumbnail).slice(0,20)+'.jpg':'';});
  return imageJson_(data);
+}
+
+// Owner-only repair: authenticate accepted submissions before adding stable image bindings.
+function repairPrizeImageBindings(){
+ var lock=LockService.getScriptLock();lock.waitLock(30000);
+ try{var book=receiptBook_(),sheet=catalogSource_(book),rows=sheet.getDataRange().getValues(),headers=rows.shift(),fixed=0;
+ rows.forEach(function(row,index){var read=function(n){var i=headers.indexOf(n);return i<0?'':String(row[i]||'').trim();};if(read('投稿状態')!=='有効')return;
+ try{var internal=JSON.parse(read('内部情報')),loaded=submissionRoot_(internal.editId),root=loaded.data,key=sheet.getSheetId()+':'+(index+2);
+ if(root.latestDraft!==internal.draftId||root.email.toLowerCase()!==(read('メールアドレス')||read('メール')).toLowerCase()||read('修正用ID')!==internal.editId)throw Error('Invalid owner');
+ var match=String(internal.imageId||'').match(/^bingo-image:([a-f0-9-]{36})$/);if(!match)throw Error('Invalid image');
+ var f=imageFile_(imageFolder_(),match[1]);if(!f||read('サムネ画像ファイル').indexOf('/'+f.getId()+'/')<0)throw Error('Invalid file');var meta=JSON.parse(f.getDescription());
+ if(meta.kind!=='bingo-thumbnail'||meta.state!=='claimed'||(meta.draftId&&meta.draftId!==internal.draftId))throw Error('Invalid binding');
+ var matches=rows.filter(function(r){try{return JSON.parse(r[headers.indexOf('内部情報')]||'{}').draftId===internal.draftId&&r[headers.indexOf('投稿状態')]==='有効';}catch(_){return false;}});if(matches.length!==1)throw Error('Ambiguous submission');
+ root.rowKey=key;submissionWrite_(loaded.file,root);meta.draftId=internal.draftId;meta.row=key;f.setDescription(JSON.stringify(meta));fixed++;
+ }catch(_){}});console.log('画像関連付けの確認・修復件数: '+fixed);
+ }finally{lock.releaseLock();}refreshPrizeCatalog();
 }

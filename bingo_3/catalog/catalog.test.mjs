@@ -26,3 +26,11 @@ const thumb='data:image/jpeg;base64,/9j/2Q==';
 c.catalogResponse_=()=>({getContent:()=>JSON.stringify({ok:true,v:1,items:[{id:'p-'+'a'.repeat(20),thumbnail:thumb}]})});
 const info=c.catalogInfoResponse_();assert.equal(info.items[0].thumbnail,undefined);assert.equal(info.items[0].thumbnailUrl,'https://watbox.net/bingo_3/catalog/media/p-'+ 'a'.repeat(20)+'-'+crypto.createHash('sha256').update(thumb).digest('hex').slice(0,20)+'.jpg');
 assert.equal(safeThumbnailUrl(info.items[0].thumbnailUrl),info.items[0].thumbnailUrl);for(const url of ['https://evil.test/a.jpg','data:image/jpeg;base64,AAAA','https://watbox.net/bingo_3/catalog/media/../secret'])assert.equal(safeThumbnailUrl(url),'');
+
+// A claimed image remains bound to the same submission after a row move.
+let imageMeta={kind:'bingo-thumbnail',state:'claimed',row:'123:13',draftId:'a'.repeat(32)},reads=0;
+c.imageFolder_=()=>({});c.imageFile_=()=>({getDescription:()=>JSON.stringify(imageMeta),getBlob:()=>({getBytes:()=>{reads++;return [255,216,255,217];}})});c.Utilities={base64Encode:()=>'/9j/2Q=='};
+const imageId='bingo-image:11111111-2222-3333-4444-555555555555';
+assert.ok(c.catalogThumbnail_(imageId,'123:2','a'.repeat(32)));assert.equal(c.catalogThumbnail_(imageId,'123:2','b'.repeat(32)),'');assert.equal(c.catalogThumbnail_(imageId,'123:2'),'');assert.equal(reads,1);
+imageMeta.state='pending';assert.equal(c.catalogThumbnail_(imageId,'123:2','a'.repeat(32)),'');assert.equal(reads,1);
+console.log('Stable submission image bindings survive row moves and reject other submissions or unclaimed images.');
