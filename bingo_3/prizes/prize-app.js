@@ -189,7 +189,7 @@ $('validate-information').addEventListener('click',validation);
 function encodeThumbnail(){
   if(!layerEditor.hasContent())return '';
   const out=renderPrizeCard(canvas,values());
-  const data=out.toDataURL('image/jpeg',.9);if(data.length<=300000)return data;
+  const data=out.toDataURL('image/jpeg',.95);if(data.length<=300000)return data;
   throw new Error('画像データが大きいため引き継げません。画像や文字を減らして再度お試しください。');
 }
 function queueSync(){if(lifecycle?.isLocked())return;clearTimeout(syncTimer);if($('auto-sync')?.checked)syncTimer=setTimeout(()=>syncForm(false),1200);}
