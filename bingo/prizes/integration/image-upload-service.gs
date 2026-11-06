@@ -8,7 +8,7 @@ function imageJson_(data){return ContentService.createTextOutput(JSON.stringify(
 function imageFolder_(){var id=PropertiesService.getScriptProperties().getProperty('IMAGE_FOLDER_ID');if(!id)throw Error('SETUP');return DriveApp.getFolderById(id);}
 function imageHash_(s){return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,s,Utilities.Charset.UTF_8).map(function(b){return ('0'+(b&255).toString(16)).slice(-2);}).join('');}
 function imageFile_(folder,token){var files=folder.getFilesByName(token+'.jpg');return files.hasNext()?files.next():null;}
-function doGet(e){if(e&&e.parameter&&e.parameter.action==='publicCatalog')return catalogResponse_();return imageJson_({ok:false,code:'METHOD'});}
+function doGet(e){if(e&&e.parameter&&e.parameter.action==='publicCatalogInfo')return catalogInfoResponse_();if(e&&e.parameter&&e.parameter.action==='publicCatalog')return catalogResponse_();return imageJson_({ok:false,code:'METHOD'});}
 function doPost(e){
   if((e&&e.postData&&e.postData.contents||'').length>1900000)return imageJson_({ok:false,code:'SIZE'});
   try{var request=JSON.parse(e&&e.postData&&e.postData.contents||'{}');if(Object.prototype.hasOwnProperty.call(request,'code'))return receiptPost_(e);if(['saveSubmissionDraft','restoreSubmission','submissionStatus'].indexOf(request.action)>=0)return submissionPost_(request);}catch(_){}
@@ -326,3 +326,11 @@ function catalogResponse_(){
 }
 function configurePrizeCatalog(){var sheet=catalogSource_(receiptBook_()),headers=sheet.getRange(1,1,1,sheet.getLastColumn()).getValues()[0];ensurePrizeColumn_(sheet,headers,'一覧公開');console.log('景品一覧を設定しました。有効な投稿は公開対象です。一覧公開を「非公開」にすると次回の更新で除外されます。');}
 function refreshPrizeCatalog(){var f=catalogFile_();if(f){var lock=LockService.getScriptLock();lock.waitLock(30000);try{var data=catalogBuild_(catalogSource_(receiptBook_()),catalogThumbnail_,Date.now()),text=JSON.stringify(data);if(text.length>6000000)throw Error('LIMIT');f.setContent(text);}finally{lock.releaseLock();}}else catalogResponse_();}
+
+// Lightweight visitor API. Image bytes are only downloaded by the Pages publisher.
+function catalogInfoResponse_(){
+ var response=catalogResponse_(),data=JSON.parse(response.getContent());
+ if(!data.ok)return imageJson_(data);
+ data.items.forEach(function(p){var thumbnail=p.thumbnail||'';delete p.thumbnail;p.thumbnailUrl=/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(thumbnail)?'https://watbox.net/bingo/catalog/media/'+p.id+'-'+imageHash_(thumbnail).slice(0,20)+'.jpg':'';});
+ return imageJson_(data);
+}

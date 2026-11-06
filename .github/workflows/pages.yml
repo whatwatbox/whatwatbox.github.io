@@ -6,6 +6,8 @@ on:
   pull_request_target:
     branches: [main]
     types: [opened, reopened, synchronize, closed, edited]
+  schedule:
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -24,6 +26,7 @@ jobs:
       pull-requests: read
     outputs:
       previews: ${{ steps.site.outputs.previews }}
+      catalog_changed: ${{ steps.site.outputs.catalog_changed }}
     steps:
       # Always run trusted main code. PR code is copied as static files only.
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -41,6 +44,7 @@ jobs:
 
   deploy:
     needs: build
+    if: github.event_name != 'schedule' || needs.build.outputs.catalog_changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       pages: write

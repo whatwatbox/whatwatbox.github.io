@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';import crypto from 'node:crypto';import {filterPrizes,safeProductUrl} from './catalog-core.js';
+import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';import crypto from 'node:crypto';import {filterPrizes,safeProductUrl,safeThumbnailUrl} from './catalog-core.js';
 const headers=['投稿状態','一覧公開','景品名','内部情報','賞の名前','景品元名','応募者名','タグ1','タグ2','商品URL(任意)','メールアドレス','ギフトURL','修正用ID','受取コード'];
 const valid=['有効','','景品A','{}','A賞','お店','提供者','ギミック','Unity','https://shop.booth.pm/items/1','secret@example.com','https://booth.pm/gifts/secret','B3E-secret','B3-secret'];
 const rows=[headers,valid,['差替済み',...valid.slice(1)],['有効','非公開',...valid.slice(2)],['要確認',...valid.slice(1)],['有効','','booth.pm/gifts/leak',...valid.slice(3)],['有効','','パック',JSON.stringify({packData:'pack'}),...valid.slice(4)]];
@@ -21,3 +21,8 @@ c.receiptBook_=()=>{if(!privateSheet)throw Error('restricted');return {};};c.cat
 assert.equal(c.catalogResponse_().ok,true);assert.equal(builds,0);
 updated=Date.now()-60001;assert.equal(c.catalogResponse_().ok,true);assert.equal(builds,1);assert.equal(c.catalogResponse_().ok,true);assert.equal(builds,1);
 privateSheet=false;assert.equal(c.catalogResponse_().code,'UNAVAILABLE');assert.equal(builds,1);
+
+const thumb='data:image/jpeg;base64,/9j/2Q==';
+c.catalogResponse_=()=>({getContent:()=>JSON.stringify({ok:true,v:1,items:[{id:'p-'+'a'.repeat(20),thumbnail:thumb}]})});
+const info=c.catalogInfoResponse_();assert.equal(info.items[0].thumbnail,undefined);assert.equal(info.items[0].thumbnailUrl,'https://watbox.net/bingo/catalog/media/p-'+ 'a'.repeat(20)+'-'+crypto.createHash('sha256').update(thumb).digest('hex').slice(0,20)+'.jpg');
+assert.equal(safeThumbnailUrl(info.items[0].thumbnailUrl),info.items[0].thumbnailUrl);for(const url of ['https://evil.test/a.jpg','data:image/jpeg;base64,AAAA','https://watbox.net/bingo/catalog/media/../secret'])assert.equal(safeThumbnailUrl(url),'');

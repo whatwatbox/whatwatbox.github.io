@@ -41,3 +41,11 @@ function catalogResponse_(){
 }
 function configurePrizeCatalog(){var sheet=catalogSource_(receiptBook_()),headers=sheet.getRange(1,1,1,sheet.getLastColumn()).getValues()[0];ensurePrizeColumn_(sheet,headers,'一覧公開');console.log('景品一覧を設定しました。有効な投稿は公開対象です。一覧公開を「非公開」にすると次回の更新で除外されます。');}
 function refreshPrizeCatalog(){var f=catalogFile_();if(f){var lock=LockService.getScriptLock();lock.waitLock(30000);try{var data=catalogBuild_(catalogSource_(receiptBook_()),catalogThumbnail_,Date.now()),text=JSON.stringify(data);if(text.length>6000000)throw Error('LIMIT');f.setContent(text);}finally{lock.releaseLock();}}else catalogResponse_();}
+
+// Lightweight visitor API. Image bytes are only downloaded by the Pages publisher.
+function catalogInfoResponse_(){
+ var response=catalogResponse_(),data=JSON.parse(response.getContent());
+ if(!data.ok)return imageJson_(data);
+ data.items.forEach(function(p){var thumbnail=p.thumbnail||'';delete p.thumbnail;p.thumbnailUrl=/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(thumbnail)?'https://watbox.net/bingo/catalog/media/'+p.id+'-'+imageHash_(thumbnail).slice(0,20)+'.jpg':'';});
+ return imageJson_(data);
+}
