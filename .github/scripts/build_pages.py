@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import tarfile
 from urllib.request import Request, urlopen
+from publish_prize_catalog import publish
 
 
 PUBLIC_DIRS = {"assets", "css", "js", "editor", "bingo"}
@@ -106,8 +107,10 @@ def main():
             content = re.sub(r"<head\b[^>]*>", lambda m: m[0] + '\n<meta name="robots" content="noindex, nofollow">',
                              content, count=1, flags=re.IGNORECASE)
             html.write_text(content, encoding="utf-8")
+    catalog_changed = publish(output)
     (output / ".nojekyll").touch()
     with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as stream:
+        stream.write(f"catalog_changed={str(catalog_changed).lower()}\n")
         stream.write(f"previews={json.dumps(previews, separators=(',', ':'))}\n")
     print(f"Prepared production and {len(previews)} PR preview(s).")
 
