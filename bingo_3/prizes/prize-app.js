@@ -1,9 +1,9 @@
 import {createSubmissionLifecycle,forgetSubmission} from './submission-client.js?v=20261104-debug3';
-import {createPackEditor} from './pack-editor.js?v=20261104-debug3';
+import {createPackEditor} from './pack-editor.js?v=20261106-gift-prefill';
 import {createThumbnailUploader} from './image-upload.js?v=20261106-quality90';
 import {renderPrizeCard,getCardTheme,layoutAward} from './card-render.js?v=20261104-debug3';
 import {createLayers} from './layers.js?v=20261106-editor';
-import {normalizeBoothUrl,parseProduct,buildPrefillUrl,createSummary,validateGiftUrls,validateFields,CARD_TEXT_LIMITS} from './prize-core.js?v=20261104-debug3';
+import {normalizeBoothUrl,parseProduct,buildPrefillUrl,createSummary,validateGiftUrls,validateFields,CARD_TEXT_LIMITS} from './prize-core.js?v=20261106-gift-prefill';
 
 const $ = id => document.getElementById(id);
 const fields = {productUrl:'booth-url',productName:'product-name',shopName:'shop-name',providerName:'provider-name',contact:'provider-contact',awardName:'award-name',price:'reference-price',clusterId:'cluster-id',category:'product-category',platform:'product-platform'};
@@ -54,6 +54,7 @@ new ResizeObserver(fitCardText).observe(document.querySelector('.prize-card'));
 document.fonts.ready.then(fitCardText);
 Object.values(fields).forEach(id=>$(id).addEventListener('input',update));
 $('guest-request').addEventListener('change',update);
+$('booth-gift-url').addEventListener('input',queueSync);
 function serviceUrl(action,args) {
   if(!config.metadataEndpoint) throw new Error('自動取得は準備中です。商品情報を直接ご入力ください。');
   const url=new URL(config.metadataEndpoint,location.href);
@@ -192,14 +193,35 @@ function encodeThumbnail(){
   const data=out.toDataURL('image/jpeg',.95);if(data.length<=300000)return data;
   throw new Error('画像データが大きいため引き継げません。画像や文字を減らして再度お試しください。');
 }
+function setFormBlocked(blocked,message='画像をアップロードしています…'){
+  const frame=$('google-form-frame'),box=$('embedded-form'),overlay=$('form-upload-overlay');
+  box.classList.toggle('is-syncing',blocked);box.setAttribute('aria-busy',String(blocked));
+  frame.inert=blocked;frame.tabIndex=blocked?-1:0;overlay.hidden=!blocked;overlay.textContent=message;
+  $('form-external').inert=blocked;$('form-external').setAttribute('aria-disabled',String(blocked));
+  if(blocked&&document.activeElement===frame)$('open-google-form').focus();
+}
+const completedFormLoads=new WeakMap();
+function loadPreparedForm(frame,url){
+  if(frame.getAttribute('src')===url&&completedFormLoads.get(frame)===url)return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    const finish=()=>{clearTimeout(timer);frame.removeEventListener('load',loaded);};
+    const loaded=()=>{finish();completedFormLoads.set(frame,url);resolve();};
+    const timer=setTimeout(()=>{finish();reject(Error('フォームの読み込みが完了しませんでした。もう一度「入力内容をフォームに反映」を押してください。'));},30000);
+    frame.addEventListener('load',loaded,{once:true});frame.src=url;
+  });
+}
 function queueSync(){if(lifecycle?.isLocked())return;clearTimeout(syncTimer);if($('auto-sync')?.checked)syncTimer=setTimeout(()=>syncForm(false),1200);}
 async function syncForm(scroll=false){
   clearTimeout(syncTimer);
   if(!config.formUrl||lifecycle?.isLocked())return;
   const version=++syncVersion;
+  setFormBlocked(true);$('open-google-form').disabled=true;$('auto-sync').disabled=true;
   try{
-    await document.fonts.ready;if(version!==syncVersion)return;
+    await document.fonts.ready;if(version!==syncVersion||lifecycle?.isLocked())return;
     const snapshot=editorSnapshot(),v={...snapshot.values};
+    v.giftUrls=snapshot.kind==='pack'?packEditor.giftUrls():$('booth-gift-url').value.trim();
+    const giftCheck=validateGiftUrls(v.giftUrls);if(giftCheck.errors.length)throw Error(giftCheck.errors[0]);if(!giftCheck.count)throw Error('BOOTHのギフトURLをご入力ください。');
+    if(!config.entries.giftUrls)throw Error('ギフトURLのフォーム項目が未設定です。');
     latestImageData=encodeThumbnail();
     if(snapshot.kind==='pack'){const errors=packEditor.errors();if(errors.length)throw Error(errors[0]);v.packData=await packEditor.encode(snapshot.items);}
     const url=new URL(buildPrefillUrl(config,v));url.searchParams.set('embedded','true');
@@ -208,18 +230,21 @@ async function syncForm(scroll=false){
     if(!config.entries.internalData||!config.entries.editId)throw new Error('内部情報のフォーム項目が未設定です。');
     status('image-data-status','画像をアップロードしています…');
     const imageId=await uploadThumbnail(latestImageData);
-    if(version!==syncVersion)return;
-    const prepared=await lifecycle.prepare(imageId,v.packData||'',{snapshot,isCurrent:()=>version===syncVersion});
-    if(version!==syncVersion)return;
+    if(version!==syncVersion||lifecycle?.isLocked())return;
+    const prepared=await lifecycle.prepare(imageId,v.packData||'',{snapshot,isCurrent:()=>version===syncVersion&&!lifecycle?.isLocked()});
+    if(version!==syncVersion||lifecycle?.isLocked())return;
     url.searchParams.set(config.entries.internalData,prepared.internalData);url.searchParams.set(config.entries.editId,prepared.editId);
-    // Only an opaque image reference enters the URL; never image bytes or gift URLs.
+    // Gift URLs go only to the configured Google Form, alongside opaque image references.
     if(url.href.length>7500)throw Error('入力内容が長すぎます。景品名などを短くしてください。');
-    const frame=$('google-form-frame');if(frame.getAttribute('src')!==url.href)frame.src=url.href;
+    const frame=$('google-form-frame');setFormBlocked(true,'画像を保存しました。フォームへ入力内容を反映しています…');
+    await loadPreparedForm(frame,url.href);if(version!==syncVersion||lifecycle?.isLocked())return;
     $('form-external').href=url.href;
     status('image-data-status','画像と復元用データを保存しました。投稿はフォームでの送信後に完了します。');
-    status('form-status','入力内容と画像IDを反映しました。下のフォームで確認し、ギフトURLを入力して送信してください。');
+    status('form-status','入力内容・ギフトURL・画像IDを反映しました。下のフォームで確認して送信してください。');
+    setFormBlocked(false);
     if(scroll)frame.scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(error){if(version!==syncVersion)return;status('image-data-status','画像の反映が完了していません。',true);status('form-status',error.message,true);}
+  }catch(error){if(version!==syncVersion||lifecycle?.isLocked())return;status('image-data-status','画像の反映が完了していません。',true);status('form-status',error.message,true);setFormBlocked(true,'反映できませんでした。入力内容を確認し、もう一度「入力内容をフォームに反映」を押してください。');}
+  finally{if(version===syncVersion){$('open-google-form').disabled=!!lifecycle?.isLocked();$('auto-sync').disabled=!!lifecycle?.isLocked();}}
 }
 $('open-google-form').addEventListener('click',()=>{const {errors}=validation();if(!errors.length)syncForm(true);});
 $('auto-sync').addEventListener('change',()=>{if($('auto-sync').checked)syncForm(false);else{clearTimeout(syncTimer);++syncVersion;status('form-status','自動反映を停止しました。フォームの内容を確認して送信してください。');status('image-data-status','');}});

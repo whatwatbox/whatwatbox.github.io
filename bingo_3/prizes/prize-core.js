@@ -50,8 +50,8 @@ export function buildPrefillUrl(config, values) {
   url.search = '';
   url.hash = '';
   url.searchParams.set('usp', 'pp_url');
-  // Deliberately excludes gift codes and image contents from URL parameters.
-  const allowed = ['productName', 'productUrl', 'shopName', 'providerName', 'description', 'guestRequest', 'contact', 'awardName', 'price', 'category', 'platform', 'clusterId'];
+  // Only configured form fields are included; image contents remain excluded.
+  const allowed = ['productName', 'productUrl', 'shopName', 'providerName', 'description', 'guestRequest', 'contact', 'awardName', 'price', 'category', 'platform', 'clusterId', 'giftUrls'];
   for (const key of allowed) {
     const entry = config.entries?.[key];
     const value = String(values[key] || '').trim();

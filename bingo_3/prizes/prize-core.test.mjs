@@ -48,3 +48,11 @@ test('card text boundary lengths and Unicode counts',()=>{
 });
 
  test("cluster ID is optional except guest requests; nonempty IDs stay validated",()=>{const v={awardName:"賞",productName:"景品",shopName:"店",providerName:"名前",price:"0",category:"その他",platform:"その他"};assert.deepEqual(validateFields(v),[]);assert.ok(validateFields({...v,guestRequest:"希望します"}).some(e=>e.key==="clusterId"));assert.ok(validateFields({...v,clusterId:"@invalid"}).some(e=>e.key==="clusterId"));});
+
+test('gift prefill supports single and ordered pack URLs without exposing image bytes',()=>{
+ const cfg={formUrl:'https://docs.google.com/forms/d/e/abc/viewform',entries:{giftUrls:'entry.1702448493',thumbnailData:'entry.9'}};
+ for(const gifts of ['https://booth.pm/gifts/test-a','https://booth.pm/gifts/test-a\nhttps://booth.pm/gifts/test-b']){
+  const url=new URL(buildPrefillUrl(cfg,{giftUrls:gifts,thumbnailData:'DO-NOT-SEND-IMAGE'}));
+  assert.equal(url.searchParams.get('entry.1702448493'),gifts);assert.ok(!url.href.includes('DO-NOT-SEND-IMAGE'));
+ }
+});
