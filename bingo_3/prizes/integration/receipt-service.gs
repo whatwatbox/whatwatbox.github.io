@@ -52,6 +52,7 @@ function preparePrizeReceipts(){
 }
 function doGet(){return receiptJson_({ok:false,code:'METHOD'});}
 function doPost(e){
+  if(PropertiesService.getScriptProperties().getProperty('RECEIPT_ENABLED')!=='true')return receiptJson_({ok:false,code:'DISABLED'});
   var lock=LockService.getScriptLock();if(!lock.tryLock(10000))return receiptJson_({ok:false,code:'BUSY'});
   try{
     var body=e&&e.postData&&e.postData.contents||'';if(body.length>300)throw Error('Invalid');
