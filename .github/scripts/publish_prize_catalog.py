@@ -6,7 +6,8 @@ import hashlib
 import json
 from pathlib import Path
 import re
-from urllib.request import urlopen
+import time
+from urllib.request import Request, urlopen
 
 ENDPOINT = 'https://script.google.com/macros/s/AKfycbx1iHBZOeodXb0zEd5VoSf4euAhLQD-xFithtg-xFUfErfgsT65EZx7-w3a7dt49NF_/exec?action=publicCatalog'
 PUBLIC_ROOT = 'https://watbox.net/bingo_3/catalog/'
@@ -56,7 +57,10 @@ def prepare(data):
     return {'ok': True, 'v': 1, 'updatedAt': public_text(data.get('updatedAt', '')), 'refreshSeconds': 60, 'contentHash': digest, 'items': items}, images
 
 def fetch_json(url):
-    with urlopen(url, timeout=90) as response:
+    separator = '&' if '?' in url else '?'
+    request = Request(url + separator + '_sync=' + str(time.time_ns()),
+                      headers={'Cache-Control': 'no-cache', 'User-Agent': 'WATBOX-Catalog-Sync'})
+    with urlopen(request, timeout=90) as response:
         raw = response.read(24000001)
     if len(raw) > 24000000:
         raise ValueError('Public catalog is too large')
@@ -75,4 +79,7 @@ def publish(output):
     for name, binary in images.items():
         (media / name).write_bytes(binary)
     (root / 'public-catalog.json').write_text(json.dumps(snapshot, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-    return previous.get('contentHash') != snapshot['contentHash']
+    changed = previous.get('contentHash') != snapshot['contentHash']
+    print(f"Catalog sync: {len(snapshot['items'])} prizes, {len(images)} images, "
+          f"source updated {snapshot['updatedAt']}, changed={str(changed).lower()}")
+    return changed

@@ -1,4 +1,8 @@
 import {filterPrizes,safeThumbnailUrl} from './catalog-core.js';
+import {createThumbnailRecovery} from './thumbnail-recovery.js';
+const recoveredImages = new Map();
+const recoverThumbnail = createThumbnailRecovery(async () => (await configPromise).endpoint);
+function displayThumbnail(url) { return recoveredImages.get(url) || url; }
 let items=[],category='',platform='',loading=false,connected=false,configPromise;
 const CACHE_KEY='bingo-3-public-catalog-v1',CACHE_TTL=5*60*1000;
 function validData(data){return data?.ok===true&&data.v===1&&Array.isArray(data.items)&&data.items.length<=1000;}
@@ -25,7 +29,7 @@ let viewerItems=[],viewerIndex=0,shownItems=[];
 function showImage(index){
   if(index<0||index>=viewerItems.length)return;
   viewerIndex=index;const prize=viewerItems[index];
-  enlarged.src=safeThumbnailUrl(prize.thumbnailUrl);enlarged.alt=prize.name;
+  enlarged.src=displayThumbnail(safeThumbnailUrl(prize.thumbnailUrl));enlarged.alt=prize.name;
   previousImage.disabled=index===0;nextImage.disabled=index===viewerItems.length-1;
   viewerPosition.textContent=(index+1)+' / '+viewerItems.length;
 }
@@ -42,7 +46,23 @@ function card(p){
   const imageUrl=safeThumbnailUrl(p.thumbnailUrl);
   if(imageUrl){
     const button=document.createElement('button');button.type='button';button.className='catalog-image-button';button.setAttribute('aria-label',p.name+'の画像を拡大');
-    const img=document.createElement('img');img.src=imageUrl;img.alt=p.name;img.className='catalog-thumb';img.loading='lazy';img.decoding='async';img.addEventListener('error',()=>{button.disabled=true;img.hidden=true;button.append(text('span','画像を反映中です','catalog-image-pending'));},{once:true});img.width=512;img.height=512;
+    const img=document.createElement('img');
+    img.src=displayThumbnail(imageUrl);img.alt=p.name;img.className='catalog-thumb';img.loading='lazy';img.decoding='async';
+    img.addEventListener('error',async ()=>{
+      button.disabled=true;img.hidden=true;
+      const pending=text('span','画像を読み込んでいます…','catalog-image-pending');
+      button.append(pending);
+      try {
+        const image=await recoverThumbnail(imageUrl);
+        recoveredImages.set(imageUrl,image);
+        img.addEventListener('load',()=>{pending.remove();img.hidden=false;button.disabled=false;},{once:true});
+        img.addEventListener('error',()=>{pending.textContent='画像を読み込めませんでした。「更新する」から再度お試しください。';},{once:true});
+        img.src=image;
+      } catch {
+        pending.textContent='画像を読み込めませんでした。「更新する」から再度お試しください。';
+      }
+    },{once:true});
+    img.width=512;img.height=512;
     button.append(img);button.addEventListener('click',()=>{viewerItems=shownItems.filter(prize=>safeThumbnailUrl(prize.thumbnailUrl));showImage(viewerItems.indexOf(p));viewer.showModal();});c.append(button);
   }else{const ph=text('div','','catalog-placeholder');ph.setAttribute('aria-label',p.name+'：サムネイル準備中');ph.append(text('span','B'),text('p','サムネイル準備中'));c.append(ph);}
   return c;

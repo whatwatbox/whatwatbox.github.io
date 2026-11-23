@@ -7,7 +7,7 @@ on:
     branches: [main]
     types: [opened, reopened, synchronize, closed, edited]
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '2-57/5 * * * *'
   workflow_dispatch:
 
 permissions:
