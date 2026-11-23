@@ -33,6 +33,19 @@ function showImage(index){
   previousImage.disabled=index===0;nextImage.disabled=index===viewerItems.length-1;
   viewerPosition.textContent=(index+1)+' / '+viewerItems.length;
 }
+enlarged.addEventListener('error',async ()=>{
+  const url=safeThumbnailUrl(viewerItems[viewerIndex]?.thumbnailUrl);
+  if(!url||enlarged.src.startsWith('data:'))return;
+  try{
+    const image=await recoverThumbnail(url);
+    recoveredImages.set(url,image);
+    if(viewer.open&&safeThumbnailUrl(viewerItems[viewerIndex]?.thumbnailUrl)===url)enlarged.src=image;
+  }catch{
+    if(viewer.open&&safeThumbnailUrl(viewerItems[viewerIndex]?.thumbnailUrl)===url){
+      viewerPosition.textContent='画像を読み込めませんでした。時間をおいて再度お試しください。';
+    }
+  }
+});
 previousImage.addEventListener('click',()=>showImage(viewerIndex-1));
 nextImage.addEventListener('click',()=>showImage(viewerIndex+1));
 viewer.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();showImage(viewerIndex+(e.key==='ArrowLeft'?-1:1));}});
